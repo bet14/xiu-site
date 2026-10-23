@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-var LANGS=['fr','en','vi','zh','ko'];
+var LANGS=['fr','en','de','es','vi','zh','ko'];
 var lang='fr',vegOnly=false,page=document.body.getAttribute('data-page')||'';
 try{var q=new URLSearchParams(location.search).get('lang'),s=localStorage.getItem('xiu-lang');lang=LANGS.indexOf(q)>=0?q:(LANGS.indexOf(s)>=0?s:lang);}catch(e){}
 
@@ -8,11 +8,13 @@ try{var q=new URLSearchParams(location.search).get('lang'),s=localStorage.getIte
 if(page==='home'){var old={'#menu':'menu.html','#semaine':'menu.html','#traiteur':'traiteur.html','#infos':'infos.html'}[location.hash];if(old){location.replace(old);return;}}
 
 function T(k){var d=I18N[lang]||I18N.fr;return d[k]!=null?d[k]:I18N.fr[k];}
+// món chưa dịch: de/es lấy tạm tiếng Anh, các ngôn ngữ khác lấy tiếng Pháp
+function fb(){return lang==='de'||lang==='es'?['en','fr']:['fr'];}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function $(s,r){return (r||document).querySelector(s);}
 function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
-function pick(o){return o?(o[lang]||o.fr||''):'';}
-function txt(it){var t=it[lang]||it.fr||['',''];return [t[0]||(it.fr&&it.fr[0])||'',t[1]||''];}
+function pick(o){if(!o)return '';if(o[lang])return o[lang];var f=fb();for(var i=0;i<f.length;i++)if(o[f[i]])return o[f[i]];return '';}
+function txt(it){var t=it[lang]||['',''],f=fb(),r=[t[0]||'',t[1]||''];for(var i=0;i<f.length;i++){var o=it[f[i]];if(!o)continue;if(!r[0]&&o[0])r[0]=o[0];if(!r[1]&&!t[0]&&o[1])r[1]=o[1];}return r;}
 function imgSrc(n){return 'assets/img/menu/'+(n.indexOf('.')>0?n:n+'.webp');}
 
 // ---------- en-tête ----------
@@ -63,7 +65,7 @@ function catsToShow(){
  var cats=(window.MENU||[]).filter(function(c){return !c.hide;}),vegs=[];
  cats.forEach(function(c){(c.items||[]).forEach(function(it){if(it.veg&&!it.hide)vegs.push(it);});});
  var out=cats.slice();
- if(vegs.length)out.push({id:'veggie',icon:'🥬',title:{fr:'Veggie',en:'Veggie',vi:'Món chay',zh:'素食',ko:'채식'},items:vegs});
+ if(vegs.length)out.push({id:'veggie',icon:'🥬',title:{fr:'Veggie',en:'Veggie',de:'Veggie',es:'Veggie',vi:'Món chay',zh:'素食',ko:'채식'},items:vegs});
  return vegOnly?out.filter(function(c){return c.id==='veggie';}):out;
 }
 function renderMenu(){

@@ -14,11 +14,13 @@
 <nav class="views" role="tablist">
 <button role="tab" data-view="menu" aria-selected="true">Thực đơn</button>
 <button role="tab" data-view="links" aria-selected="false">Mạng xã hội</button>
+<button role="tab" data-view="github" aria-selected="false">GitHub</button>
 </nav>
 <div class="bar-r">
 <span id="state" class="state">Đang tải…</span>
 <a class="btn ghost" id="preview" href="../menu.html" target="_blank" rel="noopener">Xem trang Menu</a>
 <button class="btn primary" id="save" disabled>Lưu thay đổi</button>
+<button class="btn gh" id="gh-open" title="Đưa bản trên máy lên trang web thật">Đẩy lên GitHub</button>
 </div>
 </header>
 
@@ -53,6 +55,44 @@ Trang này chỉ chạy khi máy chủ quản trị đang bật. Nhấp đúp <b
 <p class="hint">Biểu tượng: đặt tệp biểu tượng chính thức vào <b>assets/icons/instagram.svg</b> và <b>assets/icons/facebook.svg</b> (định dạng SVG). Khi chưa có tệp, trang web hiện chữ « Instagram », « Facebook ».</p>
 <label class="f"><span>Instagram</span><input id="l-ig" type="url" placeholder="https://www.instagram.com/…"></label>
 <label class="f"><span>Facebook</span><input id="l-fb" type="url" placeholder="https://www.facebook.com/…"></label>
+</div>
+</div>
+</section>
+
+<!-- ===================== GITHUB ===================== -->
+<section class="view" id="view-github" hidden>
+<div class="narrow">
+<div class="card">
+<h2>Đẩy lên GitHub</h2>
+<p class="hint">Trang web thật (GitHub Pages) lấy tệp từ kho GitHub. Sau khi « Lưu thay đổi », bấm « Kiểm tra thay đổi » để xem tệp nào khác với GitHub, rồi « Đẩy lên GitHub ». Khoảng 1–2 phút sau trang web cập nhật. Không có tệp nào trên GitHub bị xoá.</p>
+<div id="gh-dirty" class="warn" hidden>Còn thay đổi chưa lưu. Bấm « Lưu thay đổi » trước khi đẩy.</div>
+<div class="actions top"><button class="btn" id="gh-diff">Kiểm tra thay đổi</button><span id="gh-info" class="code"></span></div>
+<div id="gh-result"></div>
+<label class="f" id="gh-msg-wrap" hidden><span>Ghi chú cho lần cập nhật này</span><input type="text" id="gh-msg" maxlength="200" placeholder="Cập nhật menu"></label>
+<div class="actions" id="gh-acts" hidden>
+<button class="btn" id="gh-pull">Tải về máy</button>
+<button class="btn primary" id="gh-push">Đẩy lên GitHub</button>
+</div>
+<div id="gh-done" class="ok" hidden></div>
+</div>
+
+<div class="card">
+<h2>Kết nối</h2>
+<p id="gh-status" class="hint">Đang kiểm tra…</p>
+<div class="g2"><label class="f"><span>Kho (chủ/kho)</span><input type="text" id="gh-repo" placeholder="bet14/xiu-site"></label>
+<label class="f"><span>Nhánh</span><input type="text" id="gh-branch" placeholder="main"></label></div>
+<label class="f"><span>Token GitHub (chỉ lưu trên máy này, không đưa lên GitHub)</span><input type="password" id="gh-token" autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label>
+<div class="actions top"><button class="btn primary" id="gh-save">Lưu và kiểm tra</button><button class="btn danger small" id="gh-clear">Xoá token khỏi máy</button></div>
+<details class="howto"><summary>Cách tạo token (làm một lần)</summary>
+<ol>
+<li>Đăng nhập GitHub bằng tài khoản sở hữu kho, mở <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens</b> (đường tắt: github.com/settings/personal-access-tokens/new).</li>
+<li>Token name: <b>xiu-site admin</b>. Expiration: tuỳ chọn (ví dụ 1 năm; hết hạn thì tạo lại).</li>
+<li>Repository access: <b>Only select repositories</b> → chọn <b>xiu-site</b>.</li>
+<li>Permissions → Repository permissions → <b>Contents: Read and write</b> (Metadata: Read-only tự bật). Không cần quyền nào khác.</li>
+<li>Bấm <b>Generate token</b>, chép chuỗi bắt đầu bằng <b>github_pat_</b>, dán vào ô Token ở trên, bấm « Lưu và kiểm tra ».</li>
+</ol>
+<p class="hint">Token được lưu trong tệp <span id="gh-cfg" class="code">~/.xiu-site-admin.json</span> của người dùng Windows, ngoài thư mục xiu-site. Không gửi token cho ai. Nếu lộ token: vào lại trang trên, bấm Revoke.</p>
+</details>
 </div>
 </div>
 </section>

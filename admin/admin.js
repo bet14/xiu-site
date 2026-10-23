@@ -1,10 +1,10 @@
 (function(){
 'use strict';
-var LANGS=['fr','en','vi','zh','ko'];
-var LNAME={fr:'FR · Tiếng Pháp',en:'EN · Tiếng Anh',vi:'VI · Tiếng Việt',zh:'中文 · Tiếng Trung',ko:'한국어 · Tiếng Hàn'};
+var LANGS=['fr','en','de','es','vi','zh','ko'];
+var LNAME={fr:'FR · Tiếng Pháp',en:'EN · Tiếng Anh',de:'DE · Tiếng Đức',es:'ES · Tiếng Tây Ban Nha',vi:'VI · Tiếng Việt',zh:'中文 · Tiếng Trung',ko:'한국어 · Tiếng Hàn'};
 var BADGES=[['','Không có'],['signature','Signature'],['top1','Le nº 1 le plus aimé'],['top2','Le nº 2 le plus aimé'],['top3','Le nº 3 le plus aimé'],['populaire','Populaire'],['nouveau','Nouveau']];
 var MENU=[],WEEK=null,SITE=null,IMAGES=[],online=false;
-var selCat=0,selItem=-1,saved={menu:'',semaine:'',site:''};
+var selCat=0,selItem=-1,saved={menu:'',semaine:'',site:''},GH={diff:null,st:null};
 
 function $(s,r){return (r||document).querySelector(s);}
 function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
@@ -48,7 +48,8 @@ function changed(){var c={};if(strip(MENU)!==saved.menu)c.menu=1;if(JSON.stringi
 function dirty(){var c=changed(),n=Object.keys(c).length,st=$('#state');
  $('#save').disabled=!n||!online;
  if(!online){st.textContent='Chỉ xem — máy chủ quản trị chưa bật';st.className='state dirty';return;}
- st.textContent=n?'Có thay đổi chưa lưu':(saved.time?'Đã lưu lúc '+saved.time:'Không có thay đổi');st.className='state'+(n?' dirty':'');}
+ st.textContent=n?'Có thay đổi chưa lưu':(saved.time?'Đã lưu lúc '+saved.time:'Không có thay đổi');st.className='state'+(n?' dirty':'');
+ if(GH.diff)ghCount();else $('#gh-dirty').hidden=!n;}
 
 // ---------------- danh mục ----------------
 function cat(){return MENU[selCat];}
@@ -230,7 +231,7 @@ function save(){
  fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'Lỗi khi lưu');return j;});})
   .then(function(j){MENU.forEach(function(ct){ct.items.forEach(function(it){delete it._auto;});});saved.time=j.time;snap();
-   toast('Đã lưu. Đưa thư mục lên GitHub để khách thấy bản mới.'+(noPrice.length?' Lưu ý: giá còn để tạm — '+noPrice.slice(0,3).join(', '):''));})
+   toast('Đã lưu trên máy. Bấm « Đẩy lên GitHub » để khách thấy bản mới.'+(noPrice.length?' Lưu ý: giá còn để tạm — '+noPrice.slice(0,3).join(', '):''));})
   .catch(function(e){dirty();toast(e.message,true);});
 }
 $('#save').addEventListener('click',save);
@@ -239,7 +240,7 @@ window.addEventListener('beforeunload',function(e){if(Object.keys(changed()).len
 
 // ---------------- thêm ----------------
 $('#add-cat').addEventListener('click',function(){
- var c={id:'',icon:'',title:{fr:'Nouvelle catégorie',en:'',vi:'Danh mục mới',zh:'',ko:''},items:[]};c.id=uniqueCatId('nouvelle-categorie',c);
+ var c={id:'',icon:'',title:{fr:'Nouvelle catégorie',en:'',de:'',es:'',vi:'Danh mục mới',zh:'',ko:''},items:[]};c.id=uniqueCatId('nouvelle-categorie',c);
  MENU.push(c);selCat=MENU.length-1;selItem=-1;renderMenuView();dirty();var i=$('#cat-edit [data-ct=fr]');if(i){i.focus();i.select();}
 });
 $('#add-item').addEventListener('click',function(){
@@ -248,15 +249,115 @@ $('#add-item').addEventListener('click',function(){
 });
 
 // ---------------- chuyển tab ----------------
-$$('.views button').forEach(function(b){b.addEventListener('click',function(){
- $$('.views button').forEach(function(x){x.setAttribute('aria-selected',x===b);});
- $$('.view').forEach(function(v){v.hidden=v.id!=='view-'+b.dataset.view;});
- $('#preview').href=b.dataset.view==='menu'||b.dataset.view==='week'?'../menu.html':'../index.html';
-});});
+function showView(name){
+ $$('.views button').forEach(function(x){x.setAttribute('aria-selected',x.dataset.view===name);});
+ $$('.view').forEach(function(v){v.hidden=v.id!=='view-'+name;});
+ $('#preview').href=name==='menu'||name==='week'?'../menu.html':'../index.html';
+ if(name==='github'&&!GH.st)ghStatus();
+}
+$$('.views button').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view);});});
+
+// ---------------- GitHub ----------------
+function api(path,body){
+ return fetch('/api/github/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})})
+  .then(function(r){return r.json().catch(function(){return {error:'Lỗi máy chủ ('+r.status+')'};}).then(function(j){if(!r.ok)throw new Error(j.error||('Lỗi '+r.status));return j;});});
+}
+function ghStatus(){
+ if(!online){$('#gh-status').textContent='Máy chủ quản trị chưa bật.';$('#gh-diff').disabled=true;return Promise.resolve(null);}
+ return api('status').then(function(s){GH.st=s;
+  $('#gh-repo').value=s.repo;$('#gh-branch').value=s.branch;$('#gh-cfg').textContent=s.config_path;
+  $('#gh-status').textContent=s.configured?('Đã kết nối: token '+s.token_hint+', kho '+s.repo+', nhánh '+s.branch+'.'+(s.last_push?' Lần đẩy gần nhất từ máy này: '+s.last_push+'.':'')):'Chưa có token. Làm theo « Cách tạo token » bên dưới rồi dán token vào ô Token.';
+  $('#gh-diff').disabled=!s.configured;return s;
+ }).catch(function(e){$('#gh-status').textContent=e.message;return null;});
+}
+var KN={added:'mới',modified:'đã sửa',both:'cả hai bên đều sửa',unknown:'khác nhau',removed_remote:'đã bị xoá trên GitHub',remote_newer:'GitHub mới hơn',remote_only:'chỉ có trên GitHub'};
+function ghGroup(cls,title,note,list,ctl){
+ if(!list.length)return '';
+ return '<div class="ghg '+cls+'"><h3>'+title+' ('+list.length+')</h3>'+(note?'<p>'+note+'</p>':'')+'<ul>'
+  +list.map(function(x){return '<li>'+ctl(x)+'<code>'+esc(x.path)+'</code><span class="tag">'+esc(KN[x.kind]||x.kind)+'</span></li>';}).join('')+'</ul></div>';
+}
+function ghDiff(keepDone){
+ if(!keepDone)$('#gh-done').hidden=true;
+ GH.diff=null;$('#gh-acts').hidden=true;$('#gh-msg-wrap').hidden=true;$('#gh-info').textContent='';
+ $('#gh-result').innerHTML='<p class="hint">Đang so sánh với GitHub…</p>';$('#gh-diff').disabled=true;
+ return api('diff').then(function(d){GH.diff=d;renderDiff();}).catch(function(e){$('#gh-result').innerHTML='<div class="warn">'+esc(e.message)+'</div>';}).then(function(){$('#gh-diff').disabled=false;});
+}
+function renderDiff(){
+ var d=GH.diff,h='',cb=function(attr){return function(x){return '<input type="checkbox" '+attr+'="'+esc(x.path)+'" checked>';};};
+ $('#gh-info').textContent=d.repo+' · '+d.branch+' @ '+d.head.slice(0,7)+' · '+d.same+' tệp giống nhau';
+ h+=ghGroup('push','Sẽ đẩy lên GitHub','Các tệp đã sửa hoặc thêm trên máy này.',d.push,cb('data-push'));
+ h+=ghGroup('conflict','Cần chọn','Tệp khác nhau ở cả máy này và GitHub. Chọn giữ bản nào; mặc định là bỏ qua.',d.conflict,function(x){return '<select data-conf="'+esc(x.path)+'"><option value="">Bỏ qua</option><option value="push">Giữ bản trên máy (đẩy lên)</option><option value="pull">Lấy bản GitHub (tải về)</option></select>';});
+ h+=ghGroup('newer','GitHub có bản mới hơn','Nên tải về để bản trên máy không bị cũ. Bản đang có được chép vào admin/backups trước khi thay.',d.newer,cb('data-pull'));
+ h+=ghGroup('ronly','Chỉ có trên GitHub','Tệp trên GitHub mà máy này chưa có.',d.remote_only,cb('data-pull'));
+ if(!h)h='<div class="ok">Trên máy và GitHub đang giống nhau, không có gì để đẩy.</div>';
+ if(!d.has_base&&(d.push.length||d.conflict.length))h='<div class="warn">Lần đồng bộ đầu tiên: chưa biết bên nào sửa sau, nên tệp khác nhau được xếp vào « Cần chọn ».</div>'+h;
+ if(d.moved_since_last)h='<div class="warn">GitHub đã được cập nhật từ nơi khác kể từ lần đẩy gần nhất ở máy này.</div>'+h;
+ $('#gh-result').innerHTML=h;
+ $$('#gh-result input,#gh-result select').forEach(function(el){el.addEventListener('change',ghCount);});
+ ghCount();
+}
+function ghSel(){
+ var push=[],pull=[];
+ $$('[data-push]').forEach(function(c){if(c.checked)push.push(c.dataset.push);});
+ $$('[data-pull]').forEach(function(c){if(c.checked)pull.push(c.dataset.pull);});
+ $$('[data-conf]').forEach(function(x){if(x.value==='push')push.push(x.dataset.conf);else if(x.value==='pull')pull.push(x.dataset.conf);});
+ return {push:push,pull:pull};
+}
+function ghCount(){
+ var dirtyNow=Object.keys(changed()).length>0;$('#gh-dirty').hidden=!dirtyNow;
+ if(!GH.diff)return;
+ var d=GH.diff,s=ghSel(),any=d.push.length+d.conflict.length+d.newer.length+d.remote_only.length;
+ $('#gh-acts').hidden=!any;$('#gh-msg-wrap').hidden=!s.push.length;
+ $('#gh-push').textContent='Đẩy '+s.push.length+' tệp lên GitHub';$('#gh-push').disabled=!s.push.length||dirtyNow;
+ $('#gh-pull').textContent='Tải '+s.pull.length+' tệp về máy';$('#gh-pull').hidden=!s.pull.length;$('#gh-pull').disabled=dirtyNow;
+}
+function reloadData(){
+ return Promise.all([loadScript('../assets/menu.js'),loadScript('../assets/semaine.js'),loadScript('../assets/site.js')]).then(function(){
+  normalize(window.MENU);WEEK=normWeek(window.SEMAINE);SITE={instagram:(window.SITE&&window.SITE.instagram)||'',facebook:(window.SITE&&window.SITE.facebook)||''};
+  selItem=-1;snap();renderMenuView();renderWeek();renderLinks();loadImages();
+ });
+}
+$('#gh-diff').addEventListener('click',function(){ghDiff();});
+$('#gh-open').addEventListener('click',function(){
+ showView('github');
+ (GH.st?Promise.resolve(GH.st):ghStatus()).then(function(s){if(s&&s.configured&&!Object.keys(changed()).length)ghDiff();});
+});
+$('#gh-save').addEventListener('click',function(){
+ var b=$('#gh-save');b.disabled=true;
+ api('config',{token:$('#gh-token').value.trim(),repo:$('#gh-repo').value.trim(),branch:$('#gh-branch').value.trim()})
+  .then(function(s){$('#gh-token').value='';toast('Kết nối GitHub được: '+s.check.repo+' · '+s.check.branch+' @ '+s.check.head);return ghStatus();})
+  .catch(function(e){toast(e.message,true);}).then(function(){b.disabled=false;});
+});
+$('#gh-clear').addEventListener('click',function(){
+ if(!confirm('Xoá token GitHub khỏi máy này? (Sau đó muốn đẩy lên phải dán token lại.)'))return;
+ api('config',{clear:true}).then(function(){GH.diff=null;$('#gh-result').innerHTML='';$('#gh-acts').hidden=true;toast('Đã xoá token khỏi máy.');ghStatus();}).catch(function(e){toast(e.message,true);});
+});
+$('#gh-push').addEventListener('click',function(){
+ var s=ghSel(),d=GH.diff;if(!d||!s.push.length)return;
+ if(Object.keys(changed()).length){toast('Còn thay đổi chưa lưu. Bấm « Lưu thay đổi » trước.',true);return;}
+ if(!confirm('Đẩy '+s.push.length+' tệp lên GitHub ('+d.repo+', nhánh '+d.branch+')?\n\n'+s.push.slice(0,12).join('\n')+(s.push.length>12?'\n…':'')+'\n\nTrang web sẽ cập nhật sau khoảng 1–2 phút.'))return;
+ var b=$('#gh-push');b.disabled=true;b.textContent='Đang đẩy…';
+ api('push',{paths:s.push,message:$('#gh-msg').value,head:d.head}).then(function(r){
+  var dn=$('#gh-done');dn.hidden=false;
+  dn.innerHTML='Đã đẩy '+r.files.length+' tệp lên GitHub ('+esc(r.commit.slice(0,7))+'). <a href="'+esc(r.url)+'" target="_blank" rel="noopener">Xem trên GitHub</a>. Trang web cập nhật sau khoảng 1–2 phút.';
+  $('#gh-msg').value='';toast('Đã đẩy lên GitHub.');GH.st=null;ghStatus();return ghDiff(true);
+ }).catch(function(e){toast(e.message,true);ghCount();});
+});
+$('#gh-pull').addEventListener('click',function(){
+ var s=ghSel();if(!s.pull.length)return;
+ if(Object.keys(changed()).length){toast('Còn thay đổi chưa lưu. Bấm « Lưu thay đổi » trước.',true);return;}
+ if(!confirm('Tải '+s.pull.length+' tệp từ GitHub về máy này?\n\n'+s.pull.slice(0,12).join('\n')+(s.pull.length>12?'\n…':'')+'\n\nBản đang có trên máy được chép vào admin/backups trước khi thay.'))return;
+ var b=$('#gh-pull');b.disabled=true;b.textContent='Đang tải…';
+ api('pull',{paths:s.pull}).then(function(r){
+  toast('Đã tải '+r.files.length+' tệp về máy.');
+  var data=r.files.some(function(f){return /^assets\/(menu|semaine|site)\.js$/.test(f);});
+  return (data?reloadData():Promise.resolve()).then(function(){return ghDiff();});
+ }).catch(function(e){toast(e.message,true);ghCount();});
+});
 
 // ---------------- khởi động ----------------
 fetch('/api/ping',{cache:'no-store'}).then(function(r){online=r.ok;}).catch(function(){online=false;}).then(function(){
- $('#offline').hidden=online;
+ $('#offline').hidden=online;$('#gh-open').disabled=!online;
  return Promise.all([loadScript('../assets/menu.js'),loadScript('../assets/semaine.js'),loadScript('../assets/site.js')]);
 }).then(function(){
  normalize(window.MENU);WEEK=normWeek(window.SEMAINE);SITE={instagram:(window.SITE&&window.SITE.instagram)||'',facebook:(window.SITE&&window.SITE.facebook)||''};

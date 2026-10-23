@@ -8,10 +8,14 @@ Mở:    http://localhost:8765/admin/   (trang web xem thử: http://localhost:8
 
 Máy chủ chỉ nghe trên 127.0.0.1, người khác trong mạng không vào được.
 Mỗi lần lưu, bản cũ được chép vào admin/backups/ trước khi ghi đè.
+Nút « Đẩy lên GitHub » dùng token lưu ở ~/.xiu-site-admin.json (ngoài thư mục web).
 """
 import json, os, re, sys, time, threading, webbrowser
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ghsync  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "assets")
@@ -20,14 +24,14 @@ IMG_MENU = os.path.join(IMG, "menu")
 BACKUPS = os.path.join(ROOT, "admin", "backups")
 PORT = int(os.environ.get("XIU_PORT", "8765"))
 HOST = "127.0.0.1"
-LANGS = ["fr", "en", "vi", "zh", "ko"]
+LANGS = ["fr", "en", "de", "es", "vi", "zh", "ko"]
 BADGES = {"", "signature", "top1", "top2", "top3", "populaire", "nouveau"}
 MAX_UPLOAD = 10 * 1024 * 1024
 
 HEAD_MENU = """// =====================================================================
 // MENU XÍU — tạo bởi trang quản trị (admin). Nên sửa bằng trang quản trị:
 //   nhấp đúp Quan-ly-menu.bat rồi mở http://localhost:8765/admin/
-// Vẫn có thể sửa tay bằng Notepad. Mỗi danh mục: id, icon, title (5 ngôn ngữ),
+// Vẫn có thể sửa tay bằng Notepad. Mỗi danh mục: id, icon, title (7 ngôn ngữ),
 // hide (ẩn cả danh mục), items. Mỗi món:
 //   id    : mã món (không dấu, dùng cho đặt món sau này)
 //   img   : tên ảnh trong assets/img/menu/ (không ghi đuôi = .webp); "" nếu chưa có ảnh
@@ -36,7 +40,7 @@ HEAD_MENU = """// ==============================================================
 //   badge : "signature", "top1", "top2", "top3", "populaire", "nouveau" hoặc ""
 //   icon  : biểu tượng trước tên món
 //   hide  : true để tạm ẩn món (hết hàng) mà không xoá
-//   fr/en/vi/zh/ko : [tên món, mô tả]
+//   fr/en/de/es/vi/zh/ko : [tên món, mô tả]  (de, es để trống thì web dùng tạm tiếng Anh)
 // =====================================================================
 """
 HEAD_SEMAINE = """// =====================================================================
@@ -242,7 +246,22 @@ class Handler(SimpleHTTPRequestHandler):
                 with open(os.path.join(folder, name), "wb") as f:
                     f.write(body)
                 return self._json(200, {"ok": True, "name": name})
+            if u.path.startswith("/api/github/"):
+                data = json.loads(body.decode("utf-8") or "{}") if body else {}
+                act = u.path[len("/api/github/"):]
+                if act == "status":
+                    return self._json(200, ghsync.public_status())
+                if act == "config":
+                    return self._json(200, ghsync.set_config(data))
+                if act == "diff":
+                    return self._json(200, ghsync.compare(ROOT))
+                if act == "push":
+                    return self._json(200, ghsync.push(ROOT, data.get("paths"), data.get("message"), data.get("head")))
+                if act == "pull":
+                    return self._json(200, ghsync.pull(ROOT, data.get("paths"), BACKUPS))
             return self._json(404, {"error": "Không có chức năng này"})
+        except ghsync.GHError as e:
+            return self._json(e.code if 400 <= e.code < 600 else 400, {"error": str(e)})
         except ValueError as e:
             return self._json(400, {"error": str(e)})
         except Exception as e:  # noqa
