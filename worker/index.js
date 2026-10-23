@@ -128,8 +128,11 @@ function cookies(req) {
   });
   return out;
 }
+// Chỉ khi chạy thử trên máy (DEV_HTTP=1 trong .dev.vars) và mở bằng http:// thì bỏ cờ Secure,
+// để điện thoại cùng Wi-Fi thử được qua http://IP-máy:8787. Trên Cloudflare không bao giờ đặt DEV_HTTP.
+let INSECURE_DEV = false;
 function cookie(name, value, { maxAge, path = '/', sameSite = 'Lax' } = {}) {
-  return `${name}=${value}; Path=${path}; HttpOnly; Secure; SameSite=${sameSite}` + (maxAge != null ? `; Max-Age=${maxAge}` : '');
+  return `${name}=${value}; Path=${path}; HttpOnly;${INSECURE_DEV ? '' : ' Secure;'} SameSite=${sameSite}` + (maxAge != null ? `; Max-Age=${maxAge}` : '');
 }
 
 async function readJson(req) {
@@ -670,6 +673,7 @@ export default {
       return env.ASSETS.fetch(req);
     }
     if (!env.APP_SECRET || env.APP_SECRET.length < 32) return fail('not_configured', 503);
+    INSECURE_DEV = env.DEV_HTTP === '1' && url.protocol === 'http:';
     try {
       await ensureSchema(env);
       return await route(req, env, url);

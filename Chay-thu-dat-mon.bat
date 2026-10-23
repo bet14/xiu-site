@@ -13,11 +13,15 @@ if not exist .dev.vars (
   pause
   exit /b
 )
+set IP=localhost
+for /f "delims=" %%i in ('node worker\dev-ip.mjs') do set IP=%%i
 echo.
-echo  Trang cua tiem : http://localhost:8787/quan-ly
+echo  Trang cua tiem : http://%IP%:8787/quan-ly
 echo  Mat khau thu   : xem dong STAFF_PASSWORD trong tep .dev.vars
+echo  Dien thoai phai dung CUNG mang Wi-Fi voi may tinh nay.
+echo  Neu Windows hoi tuong lua ^(Firewall^): chon "Private networks" roi bam Allow.
 echo  Dong cua so nay (hoac Ctrl+C) de tat.
 echo.
-start "" cmd /c "timeout /t 15 >nul & start http://localhost:8787/quan-ly"
-call npx --yes wrangler@4 dev --port 8787
+start "" cmd /c "timeout /t 15 >nul & start http://%IP%:8787/quan-ly"
+call npx --yes wrangler@4 dev --ip 0.0.0.0 --port 8787
 pause
