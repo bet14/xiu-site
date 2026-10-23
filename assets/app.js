@@ -17,7 +17,7 @@ function pick(o){if(!o)return '';if(o[lang])return o[lang];var f=fb();for(var i=
 function txt(it){var t=it[lang]||['',''],f=fb(),r=[t[0]||'',t[1]||''];for(var i=0;i<f.length;i++){var o=it[f[i]];if(!o)continue;if(!r[0]&&o[0])r[0]=o[0];if(!r[1]&&!t[0]&&o[1])r[1]=o[1];}return r;}
 function imgSrc(n){return 'assets/img/menu/'+(n.indexOf('.')>0?n:n+'.webp');}
 // dùng chung với assets/order.js (đặt món tại tiệm)
-window.XIU={lang:function(){return lang;},txt:txt,T:T,esc:esc};
+window.XIU={lang:function(){return lang;},txt:txt,T:T,esc:esc,img:imgSrc};
 function hook(n,a,b){var o=window.XIU_ORDER;if(o&&o[n])o[n](a,b);}
 
 // ---------- en-tête ----------

@@ -232,27 +232,58 @@ async function addEvent(env, kind, key) {
   await env.DB.prepare('INSERT INTO events(kind, key, ts) VALUES (?, ?, ?)').bind(kind, key, now()).run();
 }
 
-// ---------------------------------------------------------------- thực đơn (đọc từ assets/menu.js)
-let menuCache = { at: 0, map: null };
+// ---------------------------------------------------------------- thực đơn (assets/menu.js) và combo (assets/formules.js)
+function parseAssigned(s, name) {
+  const i = s.indexOf(name);
+  return JSON.parse(s.slice(s.indexOf('[', i), s.lastIndexOf(']') + 1));
+}
+let menuCache = { at: 0, data: null };
 async function loadMenu(env, req) {
-  if (menuCache.map && Date.now() - menuCache.at < 60000) return menuCache.map;
-  const r = await env.ASSETS.fetch(new Request(new URL('/assets/menu.js', req.url)));
-  if (!r.ok) throw new Error('menu.js ' + r.status);
-  const s = await r.text();
-  const i = s.indexOf('window.MENU');
-  const M = JSON.parse(s.slice(s.indexOf('[', i), s.lastIndexOf(']') + 1));
-  const map = new Map();
+  if (menuCache.data && Date.now() - menuCache.at < 60000) return menuCache.data;
+  const get = async (path) => {
+    const r = await env.ASSETS.fetch(new Request(new URL(path, req.url)));
+    if (!r.ok) throw new Error(path + ' ' + r.status);
+    return r.text();
+  };
+  const [ms, fs] = await Promise.all([get('/assets/menu.js'), get('/assets/formules.js').catch(() => '')]);
+  const M = parseAssigned(ms, 'window.MENU');
+  const map = new Map();   // món đặt được (có giá, không ẩn)
+  const names = new Map(); // tên mọi món, kể cả combo
   for (const c of M) {
-    if (c.hide) continue;
     for (const it of c.items || []) {
-      if (it.hide || !it.id || map.has(it.id)) continue;
+      if (!it.id) continue;
+      if (!names.has(it.id)) names.set(it.id, { fr: (it.fr || [])[0] || it.id, vi: (it.vi || [])[0] || '' });
+      if (c.hide || it.hide || map.has(it.id)) continue;
       const cents = parsePrice(it.price);
       if (cents == null) continue;
-      map.set(it.id, { id: it.id, cents, fr: (it.fr || [])[0] || it.id, vi: (it.vi || [])[0] || '' });
+      map.set(it.id, { id: it.id, cat: c.id, cents, ...names.get(it.id) });
     }
   }
-  menuCache = { at: Date.now(), map };
-  return map;
+  let formules = [];
+  try { if (fs) formules = parseAssigned(fs, 'window.FORMULES'); } catch (e) { console.error('formules.js', e); }
+  menuCache = { at: Date.now(), data: { map, names, formules } };
+  return menuCache.data;
+}
+
+// Tính số combo: mỗi combo cần 1 khai vị + 1 món chính; khai vị dùng lần lượt theo thứ tự combo.
+// Cùng thuật toán với assets/order.js (formulas).
+function formulaCounts(lines, map, formules) {
+  let starters = 0;
+  const out = [];
+  formules.forEach((f, k) => {
+    let s = 0, m = 0;
+    for (const l of lines) {
+      const it = map.get(l.id);
+      if (!it) continue;
+      if ((f.starters || []).includes(it.cat)) s += l.qty;
+      else if ((f.mains || []).includes(it.cat) && !(f.exclude || []).includes(l.id)) m += l.qty;
+    }
+    const avail = Math.max(0, s - starters);
+    const n = Math.min(avail, m);
+    starters += n;
+    out.push({ f, n });
+  });
+  return out;
 }
 
 // ---------------------------------------------------------------- nhận diện
@@ -330,7 +361,7 @@ async function apiOrder(req, env) {
   if (!st.open) return fail(st.reason, 409);
 
   // --- kiểm tra nội dung đơn
-  const menu = await loadMenu(env, req);
+  const { map: menu, names, formules } = await loadMenu(env, req);
   if (!Array.isArray(body.items) || !body.items.length || body.items.length > LIMITS.maxLines) return fail('items');
   const lines = [];
   const seen = new Set();
@@ -346,6 +377,18 @@ async function apiOrder(req, env) {
     count += qty;
   }
   if (count > LIMITS.maxItems) return fail('items');
+  // --- combo: tự thêm nước theo combo (khách có thể bỏ bớt qua body.decline)
+  const decline = body.decline && typeof body.decline === 'object' ? body.decline : {};
+  for (const { f, n } of formulaCounts(lines, menu, formules)) {
+    const d = Math.min(n, Math.max(0, Number(decline[f.id]) | 0));
+    const q = n - d;
+    if (q <= 0) continue;
+    const drink = names.get(f.drink) || { fr: 'Boisson', vi: 'Nước' };
+    const fn = names.get(f.id) || { fr: f.id, vi: f.id };
+    const cents = Math.max(0, Number(f.drink_cents) | 0);
+    lines.push({ id: f.id, qty: q, cents, fr: `${drink.fr} · ${fn.fr}`, vi: `${drink.vi || drink.fr} · ${fn.vi || fn.fr}`, f: 1 });
+    total += cents * q;
+  }
   const name = cleanText(body.name, LIMITS.nameLen);
   const note = cleanText(body.note, LIMITS.noteLen);
   const lang = LANGS.includes(body.lang) ? body.lang : 'fr';
