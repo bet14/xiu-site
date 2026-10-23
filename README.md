@@ -23,6 +23,8 @@ Khách quét mã QR trong tiệm → `menu.html?t=MÃ` → chọn món, gửi đ
 
 - Máy chủ: Cloudflare Worker `worker/index.js`, cấu hình `wrangler.jsonc`; hai cơ sở D1 `xiu-orders` (đơn trong 24 giờ) và `xiu-stats` (thống kê ẩn danh).
 - Trang khách: `assets/order.js`, `assets/order.css` (chỉ bật khi có mã QR). Trang tiệm: `quan-ly.html`, `assets/quan-ly.js`, `assets/quan-ly.css`.
+- Sửa đơn: trên thẻ đơn bấm « Sửa » (đơn mới, đang làm hoặc đã xong). Thêm/bớt món, đổi tại chỗ / mang đi, tên, ghi chú → « Lưu thay đổi ». Máy chủ tính lại tiền và combo (`POST /api/staff/edit`), giữ bản khách gửi ban đầu để xem lại; thẻ đơn đánh dấu món mới thêm, món đổi số lượng, món khách đã bỏ. Đơn bếp đang làm thì in « phiếu sửa » có phần thay đổi. Trang của khách tự cập nhật danh sách món và tổng tiền. Hai máy cùng sửa một đơn: máy lưu sau được báo và tải bản mới.
+- Trang tiệm dùng tốt trên iPad (2 cột khi dọc, 3 cột khi ngang) và điện thoại (1 cột, thanh tab dưới đáy). Trên iPad nên « Thêm vào MH chính » từ Safari để mở toàn màn hình.
 - Chỉ những tệp được `worker/build.mjs` chép vào `dist/` mới được công khai (các trang .html, `assets/`, robots, sitemap, `_headers`). `admin/`, `worker/`, README… không lên mạng.
 - Chống spam: mã QR bí mật (đổi được), tối đa 5 đơn / 10 phút / thiết bị → khóa 60 phút; 20 đơn / 10 phút / IP; quá 25 đơn chờ thì ngừng nhận; nhận đơn theo giờ mở cửa; tùy chọn Turnstile.
 - Mỗi đêm (02:15 UTC) đơn cũ hơn 24 giờ được chép sang `xiu-stats` không kèm tên, ghi chú, thiết bị, IP, rồi xóa.

@@ -6,7 +6,12 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Xíu · Đơn tại tiệm</title>
 <meta name="theme-color" content="#2E7D32">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Xíu đơn">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/quan-ly.css">
 </head>
@@ -24,27 +29,47 @@
 
 <div id="app" hidden>
 <header class="top">
-<img src="assets/logo-xiu.png" alt="Xíu" width="76" height="40">
-<div class="state"><span id="state-dot" class="dot"></span><span id="state-txt"></span></div>
-<div class="mode" role="group" aria-label="Chế độ nhận đơn">
-<button type="button" data-mode="auto">Theo giờ mở cửa</button><button type="button" data-mode="open">Luôn mở</button><button type="button" data-mode="paused">Tạm dừng</button>
-</div>
+<img class="logo" src="assets/logo-xiu.png" alt="Xíu" width="61" height="32">
+<button type="button" id="state" class="state" aria-haspopup="dialog"><span id="state-dot" class="dot"></span><span class="state-t"><b id="state-txt"></b><small id="mode-txt"></small></span></button>
 <div class="tools">
-<button type="button" id="open-pos" class="b b-green">+ Nhập đơn tại quầy</button>
-<button type="button" id="sound" class="b b-out">Bật chuông</button>
-<button type="button" id="open-settings" class="b b-out">Cài đặt</button>
+<button type="button" id="sound" class="b b-out b-sm">Chuông</button>
+<button type="button" id="open-settings" class="b b-out b-sm">Cài đặt</button>
+<button type="button" id="open-pos" class="b b-green b-new">+ Đơn mới</button>
 </div>
 </header>
 <p id="net" class="net" hidden>Mất kết nối, đang thử lại…</p>
-<main class="board">
-<section class="col"><h2>Đơn mới <span id="n-new" class="cnt">0</span></h2><div id="list-new" class="list"></div></section>
-<section class="col"><h2>Đã xác nhận <span id="n-conf" class="cnt">0</span></h2><div id="list-conf" class="list"></div></section>
+
+<main id="board" class="board" data-tab="new">
+<section class="col" data-col="new"><h2 class="col-h">Đơn mới <span id="n-new" class="cnt cnt-red">0</span></h2><div id="list-new" class="list"></div></section>
+<section class="col" data-col="conf"><h2 class="col-h">Đang làm <span id="n-conf" class="cnt cnt-green">0</span></h2><div id="list-conf" class="list"></div></section>
+<section class="col col-past" data-col="past"><h2 class="col-h"><button type="button" id="past-toggle" class="past-t" aria-expanded="false">Xong / hủy trong 24 giờ <span id="n-past" class="cnt">0</span><span class="past-more">Xem</span></button></h2><div id="list-past" class="list"></div></section>
 </main>
-<details class="past"><summary>Xong / hủy trong 24 giờ qua <span id="n-past" class="cnt">0</span></summary><div id="list-past" class="list"></div></details>
+
+<nav class="tabbar" aria-label="Danh sách đơn">
+<button type="button" data-tab="new" aria-pressed="true">Đơn mới <span id="t-new" class="cnt cnt-red">0</span></button>
+<button type="button" data-tab="conf" aria-pressed="false">Đang làm <span id="t-conf" class="cnt cnt-green">0</span></button>
+<button type="button" data-tab="past" aria-pressed="false">Xong <span id="t-past" class="cnt">0</span></button>
+</nav>
 </div>
 
-<dialog id="settings" class="dlg">
-<div class="dlg-head"><b>Cài đặt</b><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<!-- chế độ nhận đơn -->
+<dialog id="mode-dlg" class="sheet">
+<div class="sheet-head"><b>Nhận đơn qua mã QR</b><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div class="sheet-body mode-list">
+<button type="button" data-mode="auto"><b>Theo giờ mở cửa</b><small>Tự mở 15 phút trước giờ mở cửa, ngừng 10 phút trước giờ đóng.</small></button>
+<button type="button" data-mode="open"><b>Luôn mở</b><small>Nhận cả ngoài giờ, dùng để chạy thử.</small></button>
+<button type="button" data-mode="paused"><b>Tạm dừng</b><small>Khi bếp quá tải: khách thấy thông báo gọi món tại quầy.</small></button>
+</div>
+</dialog>
+
+<!-- thao tác khác trên một đơn -->
+<dialog id="more-dlg" class="sheet">
+<div class="sheet-head"><b id="more-title">Đơn</b><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div id="more-body" class="sheet-body more-list"></div>
+</dialog>
+
+<dialog id="settings" class="sheet sheet-wide">
+<div class="sheet-head"><b>Cài đặt</b><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
 <section>
 <h3>Mã QR đặt món</h3>
 <div class="qr-row"><div id="qr" class="qr"></div>
@@ -53,9 +78,11 @@
 <div class="row"><a id="open-customer" class="b b-out" href="#" target="_blank" rel="noopener">Mở trang khách để thử</a><button type="button" id="print-qr" class="b b-green">In tờ mã QR</button><button type="button" id="rotate" class="b b-red-out">Đổi mã</button></div></div></div>
 </section>
 <section>
-<h3>Máy in</h3>
-<label class="chk"><input type="checkbox" id="auto-print"> Tự in phiếu khi bấm « Xác nhận »</label>
-<p class="hint">Phiếu in khổ 80 mm qua lệnh in của trình duyệt. Chọn máy in nhiệt làm máy in mặc định để in nhanh.</p>
+<h3>Máy này</h3>
+<label class="chk"><input type="checkbox" id="sound-chk"> Chuông báo khi có đơn mới</label>
+<label class="chk"><input type="checkbox" id="auto-print"> Tự in phiếu khi bấm « Xác nhận » và khi lưu đơn đã sửa</label>
+<label class="chk"><input type="checkbox" id="awake"> Giữ màn hình luôn sáng khi mở trang này</label>
+<p class="hint">Phiếu in khổ 80 mm qua lệnh in của trình duyệt. Trên iPad: Safari → Chia sẻ → « Thêm vào MH chính » để mở toàn màn hình như một ứng dụng.</p>
 </section>
 <section>
 <h3>Thiết bị / IP đang bị khóa</h3>
@@ -67,20 +94,34 @@
 </section>
 </dialog>
 
+<!-- nhập đơn mới / sửa đơn -->
 <dialog id="pos" class="pos">
-<div class="pos-head"><b>Nhập đơn tại quầy</b><input id="pos-q" type="search" placeholder="Tìm món (tiếng Việt hoặc tiếng Pháp)…" autocomplete="off"><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
-<div class="pos-body">
-<section class="pos-menu"><nav id="pos-cats" class="pos-cats" aria-label="Danh mục"></nav><div id="pos-grid" class="pos-grid"></div></section>
+<div class="pos-head">
+<button type="button" id="pos-close" class="b b-out b-sm">Đóng</button>
+<div class="pos-title"><b id="pos-title">Đơn mới tại quầy</b><small id="pos-sub"></small></div>
+<div class="pos-views" role="group" aria-label="Màn hình">
+<button type="button" data-view="menu" aria-pressed="true">Chọn món</button><button type="button" data-view="cart" aria-pressed="false">Đơn <span id="pos-n" class="cnt">0</span></button>
+</div>
+</div>
+<div id="pos-body" class="pos-body" data-view="menu">
+<section class="pos-menu">
+<div class="pos-tools"><input id="pos-q" type="search" placeholder="Tìm món (tiếng Việt hoặc tiếng Pháp)…" autocomplete="off" enterkeyhint="search"><nav id="pos-cats" class="pos-cats" aria-label="Danh mục"></nav></div>
+<div id="pos-grid" class="pos-grid"></div>
+</section>
 <aside class="pos-cart" id="pos-cart">
-<h3>Đơn đang nhập</h3>
+<button type="button" id="pos-back" class="b b-out pos-back">← Thêm món</button>
+<div id="pos-edit" class="pos-edit" hidden></div>
+<h3>Món trong đơn</h3>
 <ul id="pos-lines" class="c-items pos-lines"></ul>
 <p id="pos-info" class="pos-info" hidden></p>
 <div class="pos-svc" role="radiogroup" aria-label="Ăn tại chỗ hay mang đi"><button type="button" role="radio" data-psvc="place">Ăn tại chỗ<small>Sur place</small></button><button type="button" role="radio" data-psvc="emporter">Mang đi<small>À emporter</small></button></div>
 <input id="pos-name" class="pos-in" type="text" maxlength="30" placeholder="Tên hoặc số bàn *" autocomplete="off">
 <textarea id="pos-note" class="pos-in" maxlength="140" rows="2" placeholder="Ghi chú (không bắt buộc)"></textarea>
-<div class="pos-total"><span>Tổng</span><b id="pos-total">0,00 €</b></div>
+<div class="pos-foot">
 <p id="pos-msg" class="msg" role="alert"></p>
+<div class="pos-total"><span>Tổng</span><b id="pos-total">0,00 €</b></div>
 <div class="row pos-actions"><button type="button" id="pos-clear" class="b b-out">Xóa hết</button><button type="button" id="pos-send" class="b b-green">Tạo đơn</button></div>
+</div>
 </aside>
 </div>
 <button type="button" id="pos-jump" class="b b-green pos-jump" hidden></button>

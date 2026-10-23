@@ -5,6 +5,7 @@
 //                  POST /api/orders             → gửi đơn
 //                  GET  /api/orders/status?c=…  → khách xem trạng thái đơn
 //   - API tiệm:    /api/staff/*  (đăng nhập bằng mật khẩu, cookie HttpOnly)
+//                  POST /api/staff/edit        → nhân viên sửa đơn (khách đổi món, đổi tên, ghi chú…)
 //   - Thống kê:    GET /api/stats.csv?key=…     (khóa riêng STATS_KEY)
 //   - Hằng đêm:    chép đơn cũ hơn 24 giờ sang cơ sở STATS (ẩn danh) rồi xóa
 // Bí mật (Cloudflare → Worker → Settings → Variables and Secrets):
@@ -168,7 +169,8 @@ async function ensureSchema(env) {
       id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL UNIQUE, code TEXT NOT NULL UNIQUE,
       day TEXT NOT NULL, no INTEGER NOT NULL, created_at INTEGER NOT NULL, status TEXT NOT NULL,
       items TEXT NOT NULL, total_cents INTEGER NOT NULL, name TEXT, note TEXT, lang TEXT, service TEXT, src TEXT,
-      device TEXT NOT NULL, iph TEXT NOT NULL, confirmed_at INTEGER, done_at INTEGER)`),
+      device TEXT NOT NULL, iph TEXT NOT NULL, confirmed_at INTEGER, done_at INTEGER,
+      edited_at INTEGER, ver INTEGER NOT NULL DEFAULT 0, orig TEXT)`),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_dev ON orders(device, created_at)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_ip ON orders(iph, created_at)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_st ON orders(status, created_at)'),
@@ -183,14 +185,17 @@ async function ensureSchema(env) {
     S.prepare(`CREATE TABLE IF NOT EXISTS orders_archive (
       uid TEXT PRIMARY KEY, day TEXT NOT NULL, hm TEXT NOT NULL, weekday INTEGER NOT NULL, no INTEGER,
       status TEXT NOT NULL, n_items INTEGER NOT NULL, total_cents INTEGER NOT NULL, lang TEXT, service TEXT, src TEXT,
-      confirm_secs INTEGER, done_secs INTEGER)`),
+      confirm_secs INTEGER, done_secs INTEGER, edited INTEGER)`),
     S.prepare(`CREATE TABLE IF NOT EXISTS lines_archive (
       uid TEXT NOT NULL, line INTEGER NOT NULL, item_id TEXT NOT NULL, qty INTEGER NOT NULL,
       unit_cents INTEGER NOT NULL, PRIMARY KEY (uid, line))`),
   ]);
   // cơ sở tạo từ phiên bản trước: thêm cột còn thiếu (bỏ qua lỗi nếu đã có)
   for (const [db, sql] of [[env.DB, 'ALTER TABLE orders ADD COLUMN service TEXT'], [env.DB, 'ALTER TABLE orders ADD COLUMN src TEXT'],
-    [S, 'ALTER TABLE orders_archive ADD COLUMN service TEXT'], [S, 'ALTER TABLE orders_archive ADD COLUMN src TEXT']]) {
+    [env.DB, 'ALTER TABLE orders ADD COLUMN edited_at INTEGER'], [env.DB, 'ALTER TABLE orders ADD COLUMN ver INTEGER NOT NULL DEFAULT 0'],
+    [env.DB, 'ALTER TABLE orders ADD COLUMN orig TEXT'],
+    [S, 'ALTER TABLE orders_archive ADD COLUMN service TEXT'], [S, 'ALTER TABLE orders_archive ADD COLUMN src TEXT'],
+    [S, 'ALTER TABLE orders_archive ADD COLUMN edited INTEGER']]) {
     try { await db.prepare(sql).run(); } catch { /* đã có */ }
   }
   schemaReady = true;
@@ -438,11 +443,19 @@ async function apiStaffNewOrder(req, env) {
 async function apiStatus(env, url) {
   const c = (url.searchParams.get('c') || '').slice(0, 40);
   if (!c) return fail('code');
-  const r = await env.DB.prepare('SELECT no, status, total_cents, created_at FROM orders WHERE code = ?').bind(c).first();
+  const r = await env.DB.prepare('SELECT no, status, total_cents, created_at, items, service, ver FROM orders WHERE code = ?').bind(c).first();
   if (!r) return fail('gone', 404);
   let status = r.status;
   if (status === 'new' && r.created_at < now() - LIMITS.expireNew) status = 'expired';
-  return json({ ok: true, no: r.no, status, total: r.total_cents });
+  const out = { ok: true, no: r.no, status, total: r.total_cents, ver: r.ver || 0 };
+  // đơn đã được nhân viên sửa → gửi lại danh sách món mới (không kèm tên, ghi chú)
+  if (r.ver) {
+    let items = [];
+    try { items = JSON.parse(r.items); } catch { /* bỏ qua */ }
+    out.service = r.service;
+    out.lines = items.map((x) => ({ id: x.id, qty: x.qty, cents: x.cents, base: x.base == null ? x.cents : x.base, group: x.g || 'autre', fid: x.fid || null }));
+  }
+  return json(out);
 }
 
 // ---------------------------------------------------------------- API tiệm
@@ -510,8 +523,8 @@ async function apiStaffState(env, url) {
   if (url.searchParams.get('rev') === s.rev) return json({ ok: true, same: true, rev: s.rev, now: now() });
   const since = now() - LIMITS.keepSecs;
   const [o, b] = await env.DB.batch([
-    env.DB.prepare(`SELECT id, day, no, created_at, status, items, total_cents, name, note, lang, service, src, confirmed_at, done_at
-      FROM orders WHERE created_at > ? ORDER BY id DESC LIMIT 300`).bind(since),
+    env.DB.prepare(`SELECT id, day, no, created_at, status, items, total_cents, name, note, lang, service, src, confirmed_at, done_at,
+      edited_at, ver, orig FROM orders WHERE created_at > ? ORDER BY id DESC LIMIT 300`).bind(since),
     env.DB.prepare('SELECT key, until, reason FROM blocks WHERE until > ? ORDER BY until DESC LIMIT 100').bind(now()),
   ]);
   const st = orderState(s);
@@ -524,7 +537,11 @@ async function apiStaffState(env, url) {
     reason: st.reason || null,
     token: s.token,
     orderUrl: `${url.origin}/menu.html?t=${s.token}`,
-    orders: o.results.map((r) => ({ ...r, items: JSON.parse(r.items) })),
+    orders: o.results.map((r) => {
+      let orig = null;
+      try { orig = r.orig ? JSON.parse(r.orig) : null; } catch { /* bỏ qua */ }
+      return { ...r, items: JSON.parse(r.items), ver: r.ver || 0, orig };
+    }),
     blocks: b.results.map((r) => ({ key: r.key, kind: r.key.split(':')[0], until: r.until, reason: r.reason })),
   });
 }
@@ -535,11 +552,35 @@ async function apiStaffOrder(req, env) {
   const id = Number(body.id);
   if (!Number.isInteger(id) || !STATUSES.includes(body.status)) return fail('bad');
   const t = now();
-  const sets = { new: 'confirmed_at = NULL, done_at = NULL', confirmed: 'confirmed_at = COALESCE(confirmed_at, ?2)', done: 'confirmed_at = COALESCE(confirmed_at, ?2), done_at = ?2', cancelled: 'done_at = ?2' };
+  const sets = { new: 'confirmed_at = NULL, done_at = NULL', confirmed: 'confirmed_at = COALESCE(confirmed_at, ?2), done_at = NULL', done: 'confirmed_at = COALESCE(confirmed_at, ?2), done_at = ?2', cancelled: 'done_at = ?2' };
   const sql = `UPDATE orders SET status = ?1, ${sets[body.status]} WHERE id = ?3`;
   const stmt = env.DB.prepare(sql);
   await env.DB.batch([body.status === 'new' ? stmt.bind(body.status, null, id) : stmt.bind(body.status, t, id), bumpRev(env)]);
   return json({ ok: true });
+}
+
+// Nhân viên sửa đơn (khách đổi ý): kiểm tra và tính tiền lại như đơn mới, giữ số đơn, mã, giờ tạo, ngôn ngữ.
+// Lần sửa đầu tiên lưu bản khách gửi vào cột orig. "ver" chống hai máy cùng sửa một đơn.
+const EDITABLE = ['new', 'confirmed', 'done'];
+async function apiStaffEdit(req, env) {
+  const body = await readJson(req);
+  const id = Number(body.id), ver = Number(body.ver);
+  if (!Number.isInteger(id) || !Number.isInteger(ver)) return fail('bad');
+  const cur = await env.DB.prepare('SELECT id, status, items, total_cents, name, note, service, ver, orig FROM orders WHERE id = ?').bind(id).first();
+  if (!cur) return fail('gone', 404);
+  if (!EDITABLE.includes(cur.status)) return fail('locked', 409);
+  if ((cur.ver || 0) !== ver) return fail('stale', 409);
+  const o = await buildOrder(env, req, body, 'vi');
+  if (o.err) return fail(o.err);
+  const orig = cur.orig || JSON.stringify({ items: JSON.parse(cur.items), total: cur.total_cents, name: cur.name, note: cur.note, service: cur.service });
+  const [u] = await env.DB.batch([
+    env.DB.prepare(`UPDATE orders SET items = ?, total_cents = ?, name = ?, note = ?, service = ?, edited_at = ?, orig = ?, ver = ver + 1
+      WHERE id = ? AND ver = ?`)
+      .bind(JSON.stringify(o.lines), o.total, o.name || null, o.note || null, o.service, now(), orig, id, ver),
+    bumpRev(env),
+  ]);
+  if (!u.meta || !u.meta.changes) return fail('stale', 409);
+  return json({ ok: true, ver: ver + 1, total: o.total, items: o.lines });
 }
 
 async function apiStaff(req, env, url, path) {
@@ -549,6 +590,7 @@ async function apiStaff(req, env, url, path) {
   if (req.method !== 'POST') return fail('method', 405);
   if (path === '/api/staff/order') return apiStaffOrder(req, env);
   if (path === '/api/staff/orders') return apiStaffNewOrder(req, env);
+  if (path === '/api/staff/edit') return apiStaffEdit(req, env);
   if (path === '/api/staff/mode') {
     const { mode } = await readJson(req);
     if (!['auto', 'open', 'paused'].includes(mode)) return fail('bad');
@@ -587,7 +629,7 @@ async function apiStats(req, env, url) {
   const what = url.searchParams.get('what') === 'orders' ? 'orders' : 'lines';
   const S = statsDb(env);
   const sql = what === 'orders'
-    ? 'SELECT day, hm, weekday, no, status, service, src, n_items, total_cents, lang, confirm_secs, done_secs FROM orders_archive ORDER BY day, hm'
+    ? 'SELECT day, hm, weekday, no, status, service, src, n_items, total_cents, lang, confirm_secs, done_secs, edited FROM orders_archive ORDER BY day, hm'
     : `SELECT o.day, o.hm, o.weekday, o.status, o.service, o.src, o.lang, l.item_id, l.qty, l.unit_cents
        FROM lines_archive l JOIN orders_archive o ON o.uid = l.uid ORDER BY o.day, o.hm`;
   const { results } = await S.prepare(sql).all();
@@ -610,7 +652,7 @@ async function archive(env) {
   const cut = now() - LIMITS.keepSecs;
   for (let round = 0; round < 40; round++) {
     const { results } = await env.DB.prepare(
-      'SELECT uid, no, created_at, status, items, total_cents, lang, service, src, confirmed_at, done_at FROM orders WHERE created_at < ? ORDER BY id LIMIT 40',
+      'SELECT uid, no, created_at, status, items, total_cents, lang, service, src, confirmed_at, done_at, ver FROM orders WHERE created_at < ? ORDER BY id LIMIT 40',
     ).bind(cut).all();
     if (!results.length) break;
     const stmts = [];
@@ -619,10 +661,10 @@ async function archive(env) {
       let items = [];
       try { items = JSON.parse(r.items); } catch { /* bỏ qua */ }
       const status = r.status === 'new' ? 'expired' : r.status;
-      stmts.push(S.prepare(`INSERT OR IGNORE INTO orders_archive(uid, day, hm, weekday, no, status, service, src, n_items, total_cents, lang, confirm_secs, done_secs)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+      stmts.push(S.prepare(`INSERT OR IGNORE INTO orders_archive(uid, day, hm, weekday, no, status, service, src, n_items, total_cents, lang, confirm_secs, done_secs, edited)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
         r.uid, p.day, p.hm, p.dow, r.no, status, r.service || null, r.src || null, items.reduce((a, x) => a + (x.qty || 0), 0), r.total_cents, r.lang,
-        r.confirmed_at ? r.confirmed_at - r.created_at : null, r.done_at ? r.done_at - r.created_at : null));
+        r.confirmed_at ? r.confirmed_at - r.created_at : null, r.done_at ? r.done_at - r.created_at : null, r.ver ? 1 : 0));
       items.forEach((x, k) => stmts.push(S.prepare(
         'INSERT OR IGNORE INTO lines_archive(uid, line, item_id, qty, unit_cents) VALUES (?, ?, ?, ?, ?)',
       ).bind(r.uid, k, String(x.id), x.qty | 0, x.cents | 0)));
