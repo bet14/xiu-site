@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Xíu · Quản lý menu</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header class="bar">
+<div class="brand"><img src="../assets/logo-xiu-blanc.png" alt="" width="62" height="32"><span>Quản lý</span></div>
+<nav class="views" role="tablist">
+<button role="tab" data-view="menu" aria-selected="true">Thực đơn</button>
+<button role="tab" data-view="links" aria-selected="false">Mạng xã hội</button>
+</nav>
+<div class="bar-r">
+<span id="state" class="state">Đang tải…</span>
+<a class="btn ghost" id="preview" href="../menu.html" target="_blank" rel="noopener">Xem trang Menu</a>
+<button class="btn primary" id="save" disabled>Lưu thay đổi</button>
+</div>
+</header>
+
+<div id="offline" class="offline" hidden>
+Trang này chỉ chạy khi máy chủ quản trị đang bật. Nhấp đúp <b>Quan-ly-menu.bat</b> trong thư mục xiu-site, rồi mở <b>http://localhost:8765/admin/</b>.
+</div>
+
+<main>
+<!-- ===================== THỰC ĐƠN ===================== -->
+<section class="view" id="view-menu">
+<aside class="col cats">
+<div class="col-h"><b>Danh mục</b><button class="btn small" id="add-cat">+ Danh mục</button></div>
+<p class="hint">Kéo thả để đổi thứ tự. Kéo một món thả vào danh mục để chuyển món. Formules cũng là một danh mục: thêm, sửa như món bình thường (giá có thể để trống).</p>
+<ol id="cat-list" class="list"></ol>
+</aside>
+
+<section class="col items">
+<div id="cat-edit" class="card"></div>
+<div class="col-h"><b id="items-title">Món</b><button class="btn small" id="add-item">+ Thêm món</button></div>
+<ol id="item-list" class="list"></ol>
+</section>
+
+<aside class="col editor" id="item-edit"><p class="empty">Chọn một món để sửa.</p></aside>
+</section>
+
+<!-- ===================== MẠNG XÃ HỘI ===================== -->
+<section class="view" id="view-links" hidden>
+<div class="narrow">
+<div class="card">
+<h2>Liên kết trên đầu trang và chân trang</h2>
+<p class="hint">Dán đường dẫn đầy đủ, bắt đầu bằng https://. Để trống thì nút tự ẩn.</p>
+<p class="hint">Biểu tượng: đặt tệp biểu tượng chính thức vào <b>assets/icons/instagram.svg</b> và <b>assets/icons/facebook.svg</b> (định dạng SVG). Khi chưa có tệp, trang web hiện chữ « Instagram », « Facebook ».</p>
+<label class="f"><span>Instagram</span><input id="l-ig" type="url" placeholder="https://www.instagram.com/…"></label>
+<label class="f"><span>Facebook</span><input id="l-fb" type="url" placeholder="https://www.facebook.com/…"></label>
+</div>
+</div>
+</section>
+</main>
+
+<dialog id="picker" class="picker">
+<div class="picker-h"><b>Chọn ảnh có sẵn</b><button class="btn small" data-close>Đóng</button></div>
+<input id="picker-q" type="search" placeholder="Lọc theo tên ảnh…">
+<div id="picker-grid" class="grid"></div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="admin.js"></script>
+</body>
+</html>
