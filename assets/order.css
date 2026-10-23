@@ -53,6 +53,7 @@
 .oc-f{display:block;margin:12px 0 0}
 .oc-f span{display:block;font-size:13.5px;font-weight:700;color:var(--muted);margin-bottom:4px}
 .oc-f input,.oc-f textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink);resize:vertical}
+.oc-f input.need,.oc-f textarea.need{border-color:var(--red);background:var(--pink)}
 .oc-f input:focus,.oc-f textarea:focus{outline:2px solid var(--orange);border-color:var(--orange)}
 .oc-ts{margin-top:12px;min-height:0}
 .oc-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;font-size:18px}

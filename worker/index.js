@@ -364,9 +364,13 @@ async function buildOrder(env, req, body, defLang = 'fr') {
     return { id: l.id, qty: l.qty, cents: l.cents, base: l.base, g: l.group, fr: it.fr, vi: it.vi,
       ...(l.fid ? { fid: l.fid, ffr: f ? f.fr : l.fid, fvi: f ? f.vi : '', auto: l.auto ? 1 : 0 } : {}) };
   });
+  // tên/số bàn và ghi chú: bắt buộc
+  const name = cleanText(body.name, LIMITS.nameLen);
+  const note = cleanText(body.note, LIMITS.noteLen);
+  if (!name) return { err: 'name' };
+  if (!note) return { err: 'note' };
   return {
-    lines, total: calc.total, service,
-    name: cleanText(body.name, LIMITS.nameLen), note: cleanText(body.note, LIMITS.noteLen),
+    lines, total: calc.total, service, name, note,
     lang: LANGS.includes(body.lang) ? body.lang : defLang,
   };
 }

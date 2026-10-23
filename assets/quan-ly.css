@@ -161,6 +161,7 @@ a.b{display:inline-flex;align-items:center;text-decoration:none}
 .pos-svc button[aria-checked=true] small{color:#e8f5e1}
 .pos-svc button[data-psvc=emporter][aria-checked=true]{background:var(--orange);border-color:var(--orange)}
 .pos-in{font:inherit;font-size:16px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;width:100%;resize:vertical}
+.pos-in.need{border-color:var(--red);background:var(--pink)}
 .pos-total{display:flex;justify-content:space-between;align-items:baseline;font-size:18px;font-weight:700}
 .pos-total b{font-size:26px}
 .pos-actions .b{flex:1;min-height:54px;font-size:17px}

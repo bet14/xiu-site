@@ -207,11 +207,12 @@ function pstep(l,d){
  posAll();
 }
 function posAll(){posGrid();posCart();}
-function posReset(){P.cart={};P.decl={};P.svc=null;P.q='';$('#pos-q').value='';$('#pos-name').value='';$('#pos-note').value='';$('#pos-msg').textContent='';$('.pos-svc').classList.remove('need');posAll();}
+function posReset(){P.cart={};P.decl={};P.svc=null;P.q='';$('#pos-q').value='';$('#pos-name').value='';$('#pos-note').value='';$('#pos-msg').textContent='';$('.pos-svc').classList.remove('need');$('#pos-name').classList.remove('need');$('#pos-note').classList.remove('need');posAll();}
 $('#open-pos').addEventListener('click',function(){posCats();posAll();$('#pos').showModal();});
 $('#pos-cats').addEventListener('click',function(e){var b=e.target.closest('[data-pc]');if(!b)return;P.cat=b.dataset.pc;posCats();posGrid();});
 $('#pos-grid').addEventListener('click',function(e){var b=e.target.closest('[data-pid]');if(!b)return;var id=b.dataset.pid;P.cart[id]=Math.min(10,(P.cart[id]||0)+1);posAll();});
 $('#pos-q').addEventListener('input',function(){P.q=this.value;posGrid();});
+['#pos-name','#pos-note'].forEach(function(k){$(k).addEventListener('input',function(){this.classList.remove('need');});});
 $$('[data-psvc]').forEach(function(b){b.addEventListener('click',function(){P.svc=b.dataset.psvc;$('.pos-svc').classList.remove('need');posCart();});});
 $('#pos-clear').addEventListener('click',function(){if(Object.keys(P.cart).length&&!confirm('Xóa toàn bộ đơn đang nhập?'))return;posReset();});
 $('#pos-jump').addEventListener('click',function(){$('#pos-cart').scrollIntoView({behavior:'smooth',block:'start'});});
@@ -219,10 +220,12 @@ $('#pos-send').addEventListener('click',function(){
  var items=Object.keys(P.cart).map(function(id){return {id:id,qty:P.cart[id]};});
  if(!items.length){$('#pos-msg').textContent='Chưa có món nào.';return;}
  if(!P.svc){$('#pos-msg').textContent='Chọn « Ăn tại chỗ » hoặc « Mang đi ».';$('.pos-svc').classList.add('need');return;}
+ if(!$('#pos-name').value.trim()){$('#pos-msg').textContent='Nhập tên hoặc số bàn.';$('#pos-name').classList.add('need');$('#pos-name').focus();return;}
+ if(!$('#pos-note').value.trim()){$('#pos-msg').textContent='Nhập ghi chú (ghi « không » nếu không có gì).';$('#pos-note').classList.add('need');$('#pos-note').focus();return;}
  var b=this;b.disabled=true;$('#pos-msg').textContent='';
  api('POST','/orders',{items:items,decline:P.decl,service:P.svc,name:$('#pos-name').value,note:$('#pos-note').value,lang:'vi'}).then(function(r){
   b.disabled=false;
-  if(!r.ok){$('#pos-msg').textContent={items:'Có món không còn trong menu, tải lại trang.',service:'Chọn « Ăn tại chỗ » hoặc « Mang đi ».',auth:'Hết phiên đăng nhập, đăng nhập lại.'}[r.err]||'Lỗi, thử lại.';return;}
+  if(!r.ok){$('#pos-msg').textContent={name:'Nhập tên hoặc số bàn.',note:'Nhập ghi chú.',items:'Có món không còn trong menu, tải lại trang.',service:'Chọn « Ăn tại chỗ » hoặc « Mang đi ».',auth:'Hết phiên đăng nhập, đăng nhập lại.'}[r.err]||'Lỗi, thử lại.';return;}
   $('#pos').close();posReset();toast('Đã tạo đơn số '+r.no+' · '+money(r.total));
   if($('#auto-print').checked)printNo=r.no;
   refresh(true);
