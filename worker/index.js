@@ -652,7 +652,9 @@ async function route(req, env, url) {
   if (req.method === 'POST') {
     // chống CSRF: chỉ nhận JSON từ chính trang này, có tiêu đề riêng
     const origin = req.headers.get('Origin');
-    if ((origin && origin !== url.origin) || req.headers.get('X-Xiu') !== '1' ||
+    let originHost = null;
+    try { originHost = origin ? new URL(origin).host : null; } catch { originHost = 'invalid'; }
+    if ((origin && originHost !== url.host) || req.headers.get('X-Xiu') !== '1' ||
         !(req.headers.get('Content-Type') || '').startsWith('application/json')) return fail('forbidden', 403);
   }
   if (path === '/api/session' && req.method === 'GET') return apiSession(req, env, url);

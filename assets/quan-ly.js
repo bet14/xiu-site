@@ -57,7 +57,7 @@ function refresh(force){
    var fresh=[];
    r.orders.forEach(function(o){if(o.status==='new'&&seen&&!seen[o.id])fresh.push(o.id);});
    seen=seen||{};r.orders.forEach(function(o){seen[o.id]=1;});
-   S=r;S.fresh=fresh;render();
+   S=r;S.fresh=fresh;if(S.token)S.orderUrl=location.origin+'/menu.html?t='+S.token;render();
    if(printNo!=null){var po=S.orders.filter(function(o){return o.no===printNo&&o.src==='staff';})[0];printNo=null;if(po)printTicket(po);}
    if(fresh.length)chime();
   }else paintTimes();
@@ -137,6 +137,7 @@ $('#print-qr').addEventListener('click',function(){
 });
 
 // ---------------- cài đặt
+// địa chỉ trong mã QR lấy theo địa chỉ đang mở trang này (tên miền thật, workers.dev, IP máy, đường hầm thử…)
 function renderSettings(){
  if(!S.orderUrl)return;
  if($('#qr').dataset.url!==S.orderUrl){$('#qr').innerHTML=qrSvg(S.orderUrl,4);$('#qr').dataset.url=S.orderUrl;}
