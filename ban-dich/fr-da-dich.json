@@ -1,0 +1,234 @@
+{
+ "danh-muc:formules": [
+  "Formules",
+  ""
+ ],
+ "formule-plat": [
+  "Plat formule",
+  "1 entrée + 1 plat → 1 soda offert"
+ ],
+ "formule-banh-mi": [
+  "Bánh mì formule",
+  "1 entrée + 1 bánh mì → soda à 1 €"
+ ],
+ "danh-muc:speciaux": [
+  "Plats de la semaine",
+  ""
+ ],
+ "vermicelles-de-riz-fins-au-porc-roti-ban": [
+  "🥢VERMICELLES DE RIZ FINS AU PORC RÔTI - BÁNH HỎI HEO QUAY",
+  "🐷 Porc rôti à la peau croustillante et à la viande tendre\n🍜 Fins vermicelles de riz, herbes fraîches et sauce maison\n🥢 Un plat vietnamien gourmand, parfumé et plein de saveurs !"
+ ],
+ "com-tam-cha-trung-jeudi-samedi": [
+  "Riz brisé - Cơm tấm (jeudi–samedi)",
+  "Riz brisé, viande marinée, chả trứng (œuf et porc à la vapeur), bì (peau de porc émincée), légumes marinés"
+ ],
+ "banh-gio-nouveau": [
+  "Bánh giò (nouveau)",
+  "Gâteau de riz à la vapeur, porc haché, œuf de caille, mortadelle vietnamienne"
+ ],
+ "danh-muc:banhmi": [
+  "Bánh mì sandwich vietnamien",
+  ""
+ ],
+ "banh-mi-special-au-porc": [
+  "Bánh mì spécial au porc",
+  "Tout est fait maison : pâté de foie, beurre aux œufs (bơ trứng) façon mayonnaise maison, et quatre charcuteries de porc : porc rôti caramélisé (thịt xá xíu), chả lụa, jambon et chả quế (mortadelle vietnamienne à la cannelle). Servi dans un pain artisanal, avec carottes marinées, concombre et coriandre fraîche."
+ ],
+ "banh-mi-boeuf-saute": [
+  "Bánh mì bœuf sauté",
+  "Beurre aux œufs, bœuf sauce saté maison, légumes marinés (carottes et radis blanc), coriandre"
+ ],
+ "banh-mi-poulet-saute": [
+  "Bánh mì poulet sauté",
+  "Beurre aux œufs, poulet sauté, légumes marinés (carottes et radis blanc), coriandre"
+ ],
+ "banh-mi-porc-roti": [
+  "Bánh mì porc rôti",
+  "Beurre aux œufs, porc rôti, légumes marinés (carottes et radis blanc), coriandre"
+ ],
+ "banh-mi-tofu": [
+  "Bánh mì tofu",
+  "Beurre aux œufs, tofu sauté, légumes marinés (carottes et radis blanc), coriandre"
+ ],
+ "danh-muc:pho": [
+  "Soupe phở — bouillon bœuf",
+  ""
+ ],
+ "pho-boeuf": [
+  "Soupe Phở bœuf",
+  "Pâtes de riz, bœuf saignant, bœuf bien cuit, oignons, coriandre et bouillon de bœuf"
+ ],
+ "pho-tofu-et-legumes": [
+  "Soupe Phở tofu et légumes (bouillon de bœuf)",
+  "Tofu et légumes au bouillon de bœuf"
+ ],
+ "danh-muc:bobun": [
+  "Bò bún & nems",
+  ""
+ ],
+ "boeuf-saute-2-nems-porc": [
+  "Bo bun Bœuf sauté + 2 nems porc",
+  "Vermicelles de riz au bœuf sauté, 2 nems au porc, salade, concombre, carottes, pousses de soja, menthe et sauce nuoc-mâm"
+ ],
+ "poulet-saute-2-nems-poulet": [
+  "Bo bun Poulet sauté + 2 nems poulet",
+  "Vermicelles de riz au poulet sauté, 2 nems au poulet, salade, concombre, carottes, pousses de soja, menthe et sauce nuoc-mâm"
+ ],
+ "crevettes-sautees-2-nems-crevettes": [
+  "Bo bun Crevettes sautées + 2 nems crevettes",
+  "Vermicelles de riz, crevettes sautées, 2 nems aux crevettes, salade, concombre, carotte, soja, menthe, cacahuètes, sauce nuoc-mâm maison"
+ ],
+ "bo-bun-saucisse-de-porc-maison-2-nems-po": [
+  "Bo bun saucisse de porc maison + 2 nems porc",
+  "Vermicelles de riz, saucisse vietnamienne de porc, 2 nems au porc, salade, concombre, carottes, pousses de soja, menthe et sauce nuoc-mâm"
+ ],
+ "100-nems-4-nems-2-choix": [
+  "Bobun 100 % nems (4 nems à 2 choix)",
+  "Vermicelles, crudités, menthe, nuoc-mâm"
+ ],
+ "royal-boeuf-poulet-2-nems-poulet": [
+  "Bo bun Royal bœuf & poulet + 2 nems poulet",
+  "Bò bún aux deux viandes : bœuf et poulet sautés, 2 nems au poulet, salade, concombre, carottes, pousses de soja, menthe et sauce nuoc-mâm"
+ ],
+ "tofu-legumes-2-nems-tofu": [
+  "Bo bun Tofu & légumes + 2 nems tofu",
+  "Vermicelles de riz, tofu et courgettes sautés, 2 nems végétariens, salade, concombre, carotte, soja, menthe, cacahuètes, sauce soja maison"
+ ],
+ "danh-muc:mixao": [
+  "Nouilles de blé sautées ",
+  ""
+ ],
+ "poulet-croustillant": [
+  "Nouilles Poulet croustillant",
+  "Nouilles de blé sautées au poulet croustillant, soja, carotte, oignon, coriandre"
+ ],
+ "legumes-et-tofu": [
+  "Nouilles Légumes et tofu",
+  "Version végétarienne"
+ ],
+ "danh-muc:comrang": [
+  "Riz sauté avec œuf ",
+  ""
+ ],
+ "poulet-croustillant-2": [
+  "Riz sauté à l’œuf Poulet croustillant",
+  "Poulet croustillant accompagné de riz sauté à l’œuf"
+ ],
+ "poulet-saute": [
+  "Riz sauté à l’œuf  Poulet sauté",
+  "Poulet sauté avec riz sauté à l’œuf"
+ ],
+ "boeuf-saute": [
+  "Riz sauté à l’œuf Bœuf sauté",
+  "Riz sauté à l’œuf accompagné de bœuf sauté"
+ ],
+ "crevettes": [
+  "Riz sauté à l’œuf crevettes",
+  "Riz sauté à l’œuf et crevettes"
+ ],
+ "legumes-et-tofu-2": [
+  "Riz sauté à l’œuf Légumes et tofu",
+  "Riz sauté à l’œuf, tofu et légumes"
+ ],
+ "danh-muc:phoxao": [
+  "Pâtes de riz sautées à l’œuf ",
+  ""
+ ],
+ "boeuf": [
+  "Pâtes de riz sautées à l’œuf Bœuf sauté",
+  "Pâtes de riz sautées à l’œuf, au bœuf, aux carottes, aux pousses de soja et aux oignons"
+ ],
+ "crevettes-2": [
+  "Pâtes de riz sautées à l’œuf Crevettes",
+  "Pâtes de riz sautées à l’œuf, aux crevettes, aux carottes, aux pousses de soja et aux oignons"
+ ],
+ "poulet": [
+  "Pâtes de riz sautées à l’œuf Poulet",
+  "Pâtes de riz sautées à l’œuf, au poulet, aux carottes, aux pousses de soja et aux oignons"
+ ],
+ "veggie": [
+  "Pâtes de riz sautées à l’œuf Veggie",
+  "Pâtes de riz sautées à l’œuf, tofu et légumes sautés, aux carottes, aux pousses de soja et aux oignons"
+ ],
+ "danh-muc:rouleaux": [
+  "Entrées fraîches",
+  ""
+ ],
+ "rouleau-xl-crevettes": [
+  "Rouleau XL crevettes",
+  "Rouleau de printemps XL aux crevettes, coupé en 2"
+ ],
+ "rouleau-xl-saucisse-de-porc-maison": [
+  "Rouleau XL saucisse de porc saucisse maison",
+  "Rouleau de printemps XL au porc (nem nướng)"
+ ],
+ "rouleau-xl-tofu": [
+  "Rouleau XL tofu",
+  "Grand rouleau de printemps au tofu, coupé en deux"
+ ],
+ "danh-muc:nems": [
+  "Entrées chaudes",
+  ""
+ ],
+ "nems-porc-3-pcs": [
+  "Nems porc (3 pcs)",
+  "3 pièces de nem au porc"
+ ],
+ "nems-poulet-3-pcs": [
+  "Nems poulet (3 pcs)",
+  "3 pièces de nem au poulet"
+ ],
+ "nems-crevettes-3-pcs": [
+  "Nems crevettes (3 pcs)",
+  "3 rouleaux frits farcis aux crevettes"
+ ],
+ "nems-mix-4-pcs": [
+  "Nems mix (4 pcs)",
+  "1 porc, 1 poulet, 1 veggie, 1 crevette"
+ ],
+ "nems-veggie-3-pcs": [
+  "Nems veggie (3 pcs)",
+  "3 rouleaux frits farcis au tofu (veggie)"
+ ],
+ "danh-muc:desserts": [
+  "Desserts",
+  ""
+ ],
+ "gateau-de-manioc": [
+  "Gâteau de manioc",
+  "Lait de coco et manioc râpé"
+ ],
+ "tapioca-banane": [
+  "Tapioca banane",
+  "Banane, lait de coco, perles de tapioca"
+ ],
+ "nougat": [
+  "Nougat",
+  "Sésame et cacahuètes"
+ ],
+ "nems-nutella-banane-2-pcs": [
+  "Nems Nutella banane (2 pcs)",
+  ""
+ ],
+ "danh-muc:boissons": [
+  "Boissons",
+  ""
+ ],
+ "canette-33-cl": [
+  "Canette 33 cl",
+  ""
+ ],
+ "the-jasmin-chaud": [
+  "Thé jasmin chaud",
+  ""
+ ],
+ "cafe-expresso": [
+  "Café expresso",
+  ""
+ ],
+ "biere-33-cl": [
+  "Bière 33 cl",
+  "Tsingtao ou Saigon"
+ ]
+}
