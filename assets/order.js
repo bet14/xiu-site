@@ -20,13 +20,13 @@ var LOC={fr:'fr-FR',en:'en-GB',de:'de-DE',es:'es-ES',vi:'vi-VN',zh:'zh-CN',ko:'k
 
 // chuỗi bổ sung: combo, nút thêm nhanh
 (function(A){for(var l in A)for(var k in A[l])S[l][k]=A[l][k];})({
-fr:{free:"Offert",f_note:"Formule : boisson ajoutée automatiquement, choix de la canette au comptoir.",upsell:"Ajoutez une entrée (nems, rouleau) pour la formule : boisson offerte avec un plat, à 1 € avec un bánh mì.",added:"Ajouté"},
-en:{free:"Free",f_note:"Set menu: drink added automatically, choose your can at the counter.",upsell:"Add a starter (nems, roll) for the set menu: free drink with a main dish, €1 with a bánh mì.",added:"Added"},
-de:{free:"Gratis",f_note:"Menü: Getränk automatisch hinzugefügt, Dose an der Theke wählen.",upsell:"Mit einer Vorspeise (Nems, Rolle) gibt es das Menü: Getränk gratis zum Hauptgericht, 1 € zum Bánh mì.",added:"Hinzugefügt"},
-es:{free:"Gratis",f_note:"Menú: bebida añadida automáticamente, elige la lata en el mostrador.",upsell:"Añade un entrante (nems, rollito) para el menú: bebida gratis con un plato, a 1 € con un bánh mì.",added:"Añadido"},
-vi:{free:"Tặng",f_note:"Combo: nước được thêm tự động, chọn loại lon tại quầy.",upsell:"Thêm một món khai vị (chả giò, gỏi cuốn) để được combo: tặng nước khi gọi món chính, nước 1 € khi gọi bánh mì.",added:"Đã thêm"},
-zh:{free:"免费",f_note:"套餐：已自动加入饮料，请在柜台选择罐装饮料。",upsell:"加一份前菜（炸春卷、春卷）即享套餐：配主菜送饮料，配越南法包饮料仅 1 欧元。",added:"已加入"},
-ko:{free:"무료",f_note:"세트: 음료가 자동으로 추가됩니다. 캔 음료는 카운터에서 고르세요.",upsell:"애피타이저(넴, 롤)를 추가하면 세트 혜택: 메인 요리와 함께 음료 무료, 반미와 함께 음료 1유로.",added:"담았습니다"}
+fr:{free:"Offert",f_note:"Formule appliquée automatiquement : soda, thé ou café offert avec entrée + plat, à 1 € avec entrée + bánh mì. Bière non comprise. Choix du soda au comptoir.",svc_l:"Sur place ou à emporter ?",place:"Sur place",emporter:"À emporter",svc_need:"Choisissez sur place ou à emporter.",g_entree:"Entrées",g_plat:"Plats",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Boissons",g_autre:"Autres",upsell:"Ajoutez une entrée (nems, rouleau) pour la formule : boisson offerte avec un plat, à 1 € avec un bánh mì.",added:"Ajouté"},
+en:{free:"Free",f_note:"Set menu applied automatically: soda, tea or coffee free with starter + main, €1 with starter + bánh mì. Beer not included. Choose your soda at the counter.",svc_l:"Eat in or take away?",place:"Eat in",emporter:"Take away",svc_need:"Please choose eat in or take away.",g_entree:"Starters",g_plat:"Main dishes",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Drinks",g_autre:"Other",upsell:"Add a starter (nems, roll) for the set menu: free drink with a main dish, €1 with a bánh mì.",added:"Added"},
+de:{free:"Gratis",f_note:"Menü automatisch angewendet: Softdrink, Tee oder Kaffee gratis zu Vorspeise + Hauptgericht, 1 € zu Vorspeise + Bánh mì. Bier ausgenommen. Softdrink an der Theke wählen.",svc_l:"Hier essen oder mitnehmen?",place:"Hier essen",emporter:"Zum Mitnehmen",svc_need:"Bitte wählen: hier essen oder mitnehmen.",g_entree:"Vorspeisen",g_plat:"Hauptgerichte",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Getränke",g_autre:"Sonstiges",upsell:"Mit einer Vorspeise (Nems, Rolle) gibt es das Menü: Getränk gratis zum Hauptgericht, 1 € zum Bánh mì.",added:"Hinzugefügt"},
+es:{free:"Gratis",f_note:"Menú aplicado automáticamente: refresco, té o café gratis con entrante + plato, a 1 € con entrante + bánh mì. Cerveza no incluida. Elige el refresco en el mostrador.",svc_l:"¿Para tomar aquí o para llevar?",place:"Para tomar aquí",emporter:"Para llevar",svc_need:"Elige: para tomar aquí o para llevar.",g_entree:"Entrantes",g_plat:"Platos",g_banhmi:"Bánh mì",g_dessert:"Postres",g_boisson:"Bebidas",g_autre:"Otros",upsell:"Añade un entrante (nems, rollito) para el menú: bebida gratis con un plato, a 1 € con un bánh mì.",added:"Añadido"},
+vi:{free:"Tặng",f_note:"Combo tự áp dụng: nước ngọt, trà hoặc cà phê được tặng khi có khai vị + món chính, còn 1 € khi có khai vị + bánh mì. Không áp dụng cho bia. Chọn loại nước ngọt tại quầy.",svc_l:"Ăn tại chỗ hay mang đi?",place:"Ăn tại chỗ",emporter:"Mang đi",svc_need:"Vui lòng chọn ăn tại chỗ hoặc mang đi.",g_entree:"Khai vị",g_plat:"Món chính",g_banhmi:"Bánh mì",g_dessert:"Tráng miệng",g_boisson:"Đồ uống",g_autre:"Khác",upsell:"Thêm một món khai vị (chả giò, gỏi cuốn) để được combo: tặng nước khi gọi món chính, nước 1 € khi gọi bánh mì.",added:"Đã thêm"},
+zh:{free:"免费",f_note:"套餐自动生效：前菜+主菜送汽水、茶或咖啡；前菜+越南法包饮料仅 1 欧元。啤酒除外。汽水口味请在柜台选择。",svc_l:"堂食还是外带？",place:"堂食",emporter:"外带",svc_need:"请选择堂食或外带。",g_entree:"前菜",g_plat:"主菜",g_banhmi:"越南法包",g_dessert:"甜点",g_boisson:"饮料",g_autre:"其他",upsell:"加一份前菜（炸春卷、春卷）即享套餐：配主菜送饮料，配越南法包饮料仅 1 欧元。",added:"已加入"},
+ko:{free:"무료",f_note:"세트 자동 적용: 애피타이저+메인 시 탄산음료·차·커피 무료, 애피타이저+반미 시 1유로. 맥주 제외. 탄산음료는 카운터에서 고르세요.",svc_l:"매장 식사 또는 포장?",place:"매장 식사",emporter:"포장",svc_need:"매장 식사 또는 포장을 선택해 주세요.",g_entree:"애피타이저",g_plat:"메인 요리",g_banhmi:"반미",g_dessert:"디저트",g_boisson:"음료",g_autre:"기타",upsell:"애피타이저(넴, 롤)를 추가하면 세트 혜택: 메인 요리와 함께 음료 무료, 반미와 함께 음료 1유로.",added:"담았습니다"}
 });
 
 function L(){return X.lang();}
@@ -54,7 +54,8 @@ try{
 var ITEMS={},CAT={},ALL={};
 (window.MENU||[]).forEach(function(c){(c.items||[]).forEach(function(it){if(!it.id)return;if(!ALL[it.id])ALL[it.id]=it;if(c.hide||it.hide||ITEMS[it.id])return;ITEMS[it.id]=it;CAT[it.id]=c.id;});});
 function priceOf(it){return it?cents(it.price):null;}
-var FORM=(window.FORMULES||[]).filter(function(f){return f&&f.id;});
+var CFG=window.FORMULES||{},CALC=window.XIU_CALC;
+var FORM=CFG.formules||[];
 
 var info=null;           // trả lời của /api/session
 var cart=load('xiu-cart')||{};
@@ -64,38 +65,30 @@ if(last&&Date.now()-last.at>6*3600e3){last=null;lstore('xiu-last',null);}
 var tsToken=null,tsWidget=null,polling=null,lastStatus=null,sending=false;
 
 function cleanCart(){Object.keys(cart).forEach(function(id){if(!priceOf(ITEMS[id])||!(cart[id]>0))delete cart[id];});}
-// combo: cùng thuật toán với máy chủ (worker/index.js → formulaCounts)
-function formulas(){
- var used=0,out=[];
- FORM.forEach(function(f){
-  var s=0,m=0;
-  for(var id in cart){var c=CAT[id];if((f.starters||[]).indexOf(c)>=0)s+=cart[id];else if((f.mains||[]).indexOf(c)>=0&&(f.exclude||[]).indexOf(id)<0)m+=cart[id];}
-  var n=Math.min(Math.max(0,s-used),m);used+=n;
-  var d=Math.min(n,decl[f.id]|0),q=n-d;
-  out.push({f:f,n:n,q:q,m:m,cents:Math.max(0,f.drink_cents|0)});
- });
- return out;
+// nhóm món + combo: dùng chung assets/formule-calc.js với máy chủ
+function calc(){
+ var items=[];Object.keys(cart).forEach(function(id){var p=priceOf(ITEMS[id]);if(p)items.push({id:id,qty:cart[id],cents:p,cat:CAT[id]});});
+ var ad=CFG.auto_drink&&ALL[CFG.auto_drink],adCat=null;
+ (window.MENU||[]).forEach(function(c){(c.items||[]).forEach(function(it){if(ad&&it===ad)adCat=c.id;});});
+ if(!CALC)return {lines:items.map(function(i){return {id:i.id,qty:i.qty,cents:i.cents,base:i.cents,group:'autre'};}),total:0,upsell:false};
+ return CALC.compute(CFG,items,decl,ad?{id:ad.id,cents:cents(ad.price)||0,cat:adCat}:null);
 }
-function needStarter(fs){var left=0;fs.forEach(function(x){left+=x.m-x.n;});return left>0;}
-// các dòng của đơn: món khách chọn + nước theo combo
-function lines(){
- var out=[];
- Object.keys(cart).forEach(function(id){var p=priceOf(ITEMS[id]);if(p)out.push({id:id,qty:cart[id],cents:p});});
- formulas().forEach(function(x){if(x.n)out.push({id:x.f.id,drink:x.f.drink,qty:x.q,max:x.n,cents:x.cents,f:1});});
- return out;
-}
+function lines(){return calc().lines;}
 function cartCount(){var n=0;lines().forEach(function(l){n+=l.qty;});return n;}
-function cartTotal(){var s=0;lines().forEach(function(l){s+=l.qty*l.cents;});return s;}
+var service=load('xiu-svc');
+function cartTotal(){return calc().total;}
 function setQty(id,q){q=Math.max(0,Math.min(10,q|0));if(q)cart[id]=q;else delete cart[id];store('xiu-cart',cart);paint();}
 function setDecl(fid,max,q){decl[fid]=Math.max(0,Math.min(max,max-q));store('xiu-decl',decl);paint();}
+function setService(v){service=v;store('xiu-svc',v);if(cartDlg.open)renderCart();}
 function active(){return !!(token&&info&&info.ok);}
 function canOrder(){return active()&&info.open;}
 function reasonText(){if(!info)return '';if(!info.ok)return t('token');if(info.reason==='blocked')return t('blocked').replace('{m}',Math.max(1,Math.ceil(((info.until||0)*1000-Date.now())/60000)));return t(info.reason||'closed');}
 // tên + ảnh của một dòng, theo ngôn ngữ đang chọn
 function lineView(l){
- if(l.f){var d=ALL[l.drink],fo=ALL[l.id];return {name:d?X.txt(d)[0]:'',sub:fo?X.txt(fo)[0]:'',img:d&&d.img?X.img(d.img):''};}
- var it=ALL[l.id];return {name:it?X.txt(it)[0]:l.id,sub:'',img:it&&it.img?X.img(it.img):''};
+ var it=ALL[l.id],fo=l.fid&&ALL[l.fid];
+ return {name:it?X.txt(it)[0]:l.id,sub:fo?X.txt(fo)[0]:'',img:it&&it.img?X.img(it.img):''};
 }
+function priceHtml(l,mult){var c=l.cents*mult,b=l.base*mult;return (b>c?'<s>'+esc(money(b))+'</s> ':'')+esc(c?money(c):t('free'));}
 function thumb(v){return '<span class="oc-img">'+(v.img?'<img src="'+esc(v.img)+'" alt="" loading="lazy" width="56" height="56">':'')+'</span>';}
 
 // ---------- giao diện cố định
@@ -160,25 +153,30 @@ function onOpen(it,d){
 
 // ---------- giỏ hàng
 function showCart(){renderCart();openDlg(cartDlg);}
+function groupedList(ls,row){
+ var h='',cur=null;
+ ls.forEach(function(l,i){if(l.group!==cur){cur=l.group;h+='<li class="o-gh">'+esc(t('g_'+cur)||cur)+'</li>';}h+=row(l,i);});
+ return h;
+}
 function renderCart(msg){
  cleanCart();
- var ls=lines(),fs=formulas(),h='<div class="sheet-head"><b>'+esc(t('cart'))+'</b><button type="button" class="md-close sheet-x" aria-label="'+esc(X.T('close'))+'">'+X_SVG+'</button></div><div class="oc-body">';
+ var c=calc(),ls=c.lines,h='<div class="sheet-head"><b>'+esc(t('cart'))+'</b><button type="button" class="md-close sheet-x" aria-label="'+esc(X.T('close'))+'">'+X_SVG+'</button></div><div class="oc-body">';
  if(!Object.keys(cart).length)h+='<p class="oc-empty">'+esc(t('empty'))+'</p>';
  else{
-  h+='<ul class="oc-list">';
-  ls.forEach(function(l,i){var v=lineView(l);
-   h+='<li class="'+(l.f?'oc-f-line':'')+'" data-i="'+i+'">'+thumb(v)
-    +'<div class="oc-name"><b>'+esc(v.name)+'</b>'+(v.sub?'<small>'+esc(v.sub)+'</small>':'')+'<span>'+esc(l.cents?money(l.cents):t('free'))+'</span></div>'
-    +'<div class="stepper sm"><button type="button" class="st-m" aria-label="−">−</button><span class="st-q">'+l.qty+'</span><button type="button" class="st-p" aria-label="+"'+(l.f&&l.qty>=l.max?' disabled':'')+'>+</button></div>'
-    +'<div class="oc-sum">'+esc(l.cents?money(l.cents*l.qty):t('free'))+'</div></li>';});
-  h+='</ul>';
-  if(fs.some(function(x){return x.n;}))h+='<p class="oc-info">'+esc(t('f_note'))+'</p>';
-  else if(needStarter(fs))h+='<p class="oc-info up">'+esc(t('upsell'))+'</p>';
+  h+='<ul class="oc-list">'+groupedList(ls,function(l,i){var v=lineView(l);
+   return '<li class="oc-line'+(l.fid?' oc-f-line':'')+'" data-i="'+i+'">'+thumb(v)
+    +'<div class="oc-name"><b>'+esc(v.name)+'</b>'+(v.sub?'<small>'+esc(v.sub)+'</small>':'')+'<span>'+priceHtml(l,1)+'</span></div>'
+    +'<div class="stepper sm"><button type="button" class="st-m" aria-label="−">−</button><span class="st-q">'+l.qty+'</span><button type="button" class="st-p" aria-label="+"'+(l.auto&&l.qty>=l.max?' disabled':'')+'>+</button></div>'
+    +'<div class="oc-sum">'+priceHtml(l,l.qty)+'</div></li>';})+'</ul>';
+  if(c.lines.some(function(l){return l.fid;}))h+='<p class="oc-info">'+esc(t('f_note'))+'</p>';
+  else if(c.upsell)h+='<p class="oc-info up">'+esc(t('upsell'))+'</p>';
   var f=load('xiu-form')||{};
-  h+='<label class="oc-f"><span>'+esc(t('name'))+'</span><input type="text" class="oc-n" maxlength="30" autocomplete="given-name" value="'+esc(f.name||'')+'"></label>'
+  h+='<div class="oc-svc"><span>'+esc(t('svc_l'))+'</span><div class="seg2" role="radiogroup">'
+   +['place','emporter'].map(function(v){return '<button type="button" role="radio" aria-checked="'+(service===v)+'" data-svc="'+v+'">'+esc(t(v))+'</button>';}).join('')+'</div></div>'
+   +'<label class="oc-f"><span>'+esc(t('name'))+'</span><input type="text" class="oc-n" maxlength="30" autocomplete="given-name" value="'+esc(f.name||'')+'"></label>'
    +'<label class="oc-f"><span>'+esc(t('note'))+'</span><textarea class="oc-note" maxlength="140" rows="2" placeholder="'+esc(t('note_ph'))+'">'+esc(f.note||'')+'</textarea></label>'
    +'<div class="oc-ts"></div>'
-   +'<div class="oc-total"><span>'+esc(t('total'))+'</span><b>'+esc(money(cartTotal()))+'</b></div>'
+   +'<div class="oc-total"><span>'+esc(t('total'))+'</span><b>'+esc(money(c.total))+'</b></div>'
    +'<p class="oc-pay">'+esc(t('pay'))+'</p>'
    +(msg?'<p class="oc-msg" role="alert">'+esc(msg)+'</p>':(!canOrder()?'<p class="oc-msg" role="alert">'+esc(reasonText())+'</p>':''))
    +'<button type="button" class="btn btn-red btn-lg oc-send"'+(canOrder()&&!sending?'':' disabled')+'>'+esc(sending?t('sending'):t('send'))+'</button>';
@@ -186,9 +184,10 @@ function renderCart(msg){
  h+='</div>';
  var sc=cartDlg.scrollTop;cartDlg.innerHTML=h;cartDlg.scrollTop=sc;
  $('.sheet-x',cartDlg).addEventListener('click',function(){cartDlg.close();});
- $$('.oc-list li',cartDlg).forEach(function(li){var l=ls[+li.getAttribute('data-i')];
-  $('.st-m',li).addEventListener('click',function(){if(l.f)setDecl(l.id,l.max,l.qty-1);else setQty(l.id,l.qty-1);});
-  $('.st-p',li).addEventListener('click',function(){if(l.f)setDecl(l.id,l.max,l.qty+1);else setQty(l.id,l.qty+1);});});
+ $$('.oc-list li.oc-line',cartDlg).forEach(function(li){var l=ls[+li.getAttribute('data-i')];
+  $('.st-m',li).addEventListener('click',function(){if(l.auto)setDecl(l.fid,l.max,l.qty-1);else setQty(l.id,(cart[l.id]||0)-1);});
+  $('.st-p',li).addEventListener('click',function(){if(l.auto)setDecl(l.fid,l.max,l.qty+1);else setQty(l.id,(cart[l.id]||0)+1);});});
+ $$('[data-svc]',cartDlg).forEach(function(b){b.addEventListener('click',function(){setService(b.getAttribute('data-svc'));});});
  var n=$('.oc-n',cartDlg),no=$('.oc-note',cartDlg);
  function keep(){store('xiu-form',{name:n.value,note:no.value});}
  if(n){n.addEventListener('input',keep);no.addEventListener('input',keep);}
@@ -212,22 +211,23 @@ function api(method,path,body){
 function send(){
  if(sending||!canOrder())return;
  var items=Object.keys(cart).map(function(id){return {id:id,qty:cart[id]};});if(!items.length)return;
- var snap=lines().filter(function(l){return l.qty>0;}).map(function(l){return {id:l.id,drink:l.drink||null,qty:l.qty,cents:l.cents,f:l.f||0};});
- var d={};formulas().forEach(function(x){if(x.n&&x.q<x.n)d[x.f.id]=x.n-x.q;});
+ if(!service){renderCart(t('svc_need'));var sv=$('.oc-svc',cartDlg);if(sv){sv.classList.add('need');sv.scrollIntoView({block:'center'});}return;}
+ var snap=lines().filter(function(l){return l.qty>0;}).map(function(l){return {id:l.id,qty:l.qty,cents:l.cents,base:l.base,group:l.group,fid:l.fid||null};});
+ var d={};lines().forEach(function(l){if(l.auto&&l.qty<l.max)d[l.fid]=l.max-l.qty;});
  var f=load('xiu-form')||{};
  sending=true;renderCart();
- api('POST','/orders',{t:token,items:items,decline:d,name:f.name||'',note:f.note||'',lang:L(),ts:tsToken}).then(function(r){
+ api('POST','/orders',{t:token,items:items,decline:d,service:service,name:f.name||'',note:f.note||'',lang:L(),ts:tsToken}).then(function(r){
   sending=false;
   if(r.ok){
    cart={};decl={};store('xiu-cart',cart);store('xiu-decl',decl);store('xiu-form',{name:f.name||''});
-   last={code:r.code,no:r.no,at:Date.now(),total:r.total,lines:snap};lstore('xiu-last',last);lastStatus='new';
+   last={code:r.code,no:r.no,at:Date.now(),total:r.total,lines:snap,service:service};lstore('xiu-last',last);lastStatus='new';
    cartDlg.close();paint();showDone();poll();return;
   }
   if(r.err==='blocked'){info.open=false;info.reason='blocked';info.until=r.until;}
   else if(r.err==='closed'||r.err==='paused'){info.open=false;info.reason=r.err;}
   else if(r.err==='token'){info.ok=false;}
   if(window.turnstile&&tsWidget!=null)try{window.turnstile.reset(tsWidget);}catch(e){}
-  var m={blocked:reasonText(),closed:t('closed'),paused:t('paused'),busy:t('busy'),token:t('token'),robot:t('robot'),device:t('err'),items:t('err')}[r.err]||t('err');
+  var m={service:t('svc_need'),blocked:reasonText(),closed:t('closed'),paused:t('paused'),busy:t('busy'),token:t('token'),robot:t('robot'),device:t('err'),items:t('err')}[r.err]||t('err');
   paint();renderCart(m);
  },function(){sending=false;renderCart(t('err'));});
 }
@@ -237,12 +237,13 @@ function showDone(){renderDone();openDlg(doneDlg);}
 function renderDone(){
  if(!last){doneDlg.close();return;}
  var st=lastStatus||'new',fin=st==='done'||st==='cancelled'||st==='expired';
- var items=(last.lines||[]).map(function(l){var v=lineView(l);
-  return '<li>'+thumb(v)+'<div class="od-n"><b>'+esc(v.name)+'</b>'+(v.sub?'<small>'+esc(v.sub)+'</small>':'')+'</div><span class="od-q">×'+l.qty+'</span><span class="od-p">'+esc(l.cents?money(l.cents*l.qty):t('free'))+'</span></li>';}).join('');
+ var items=groupedList(last.lines||[],function(l){var v=lineView(l);
+  return '<li class="od-line">'+thumb(v)+'<div class="od-n"><b>'+esc(v.name)+'</b>'+(v.sub?'<small>'+esc(v.sub)+'</small>':'')+'</div><span class="od-q">×'+l.qty+'</span><span class="od-p">'+priceHtml({cents:l.cents,base:l.base==null?l.cents:l.base},l.qty)+'</span></li>';});
  doneDlg.innerHTML='<div class="sheet-head"><b>'+esc(t('sent'))+'</b><button type="button" class="md-close sheet-x" aria-label="'+esc(X.T('close'))+'">'+X_SVG+'</button></div>'
   +'<div class="od-body"><div class="od-k">'+esc(t('your_no'))+'</div><div class="od-no">'+esc(last.no)+'</div>'
   +'<div class="od-st st-'+esc(st)+'">'+esc(t('st_'+st))+'</div>'
   +(st==='new'?'<p class="od-show">'+esc(t('show'))+'</p>':'')
+  +(last.service?'<div class="od-svc">'+esc(t(last.service))+'</div>':'')
   +(items?'<ul class="od-list">'+items+'</ul>':'')
   +(last.total!=null?'<div class="od-total"><span>'+esc(t('total'))+'</span><b>'+esc(money(last.total))+'</b></div>':'')
   +(fin&&active()?'<button type="button" class="btn btn-green od-again">'+esc(t('again'))+'</button>':'')+'</div>';

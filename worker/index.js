@@ -14,7 +14,10 @@
 //   TURNSTILE_SITEKEY, TURNSTILE_SECRET (tùy chọn) chống robot
 // =====================================================================
 
+import CALC from '../assets/formule-calc.js';
+
 const LANGS = ['fr', 'en', 'de', 'es', 'vi', 'zh', 'ko'];
+const SERVICES = ['place', 'emporter']; // ăn tại chỗ / mang đi
 
 const LIMITS = {
   devOrders: 5, devWindow: 600,     // tối đa 5 đơn / 10 phút / thiết bị
@@ -161,7 +164,7 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL UNIQUE, code TEXT NOT NULL UNIQUE,
       day TEXT NOT NULL, no INTEGER NOT NULL, created_at INTEGER NOT NULL, status TEXT NOT NULL,
-      items TEXT NOT NULL, total_cents INTEGER NOT NULL, name TEXT, note TEXT, lang TEXT,
+      items TEXT NOT NULL, total_cents INTEGER NOT NULL, name TEXT, note TEXT, lang TEXT, service TEXT,
       device TEXT NOT NULL, iph TEXT NOT NULL, confirmed_at INTEGER, done_at INTEGER)`),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_dev ON orders(device, created_at)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_ip ON orders(iph, created_at)'),
@@ -176,12 +179,16 @@ async function ensureSchema(env) {
   await S.batch([
     S.prepare(`CREATE TABLE IF NOT EXISTS orders_archive (
       uid TEXT PRIMARY KEY, day TEXT NOT NULL, hm TEXT NOT NULL, weekday INTEGER NOT NULL, no INTEGER,
-      status TEXT NOT NULL, n_items INTEGER NOT NULL, total_cents INTEGER NOT NULL, lang TEXT,
+      status TEXT NOT NULL, n_items INTEGER NOT NULL, total_cents INTEGER NOT NULL, lang TEXT, service TEXT,
       confirm_secs INTEGER, done_secs INTEGER)`),
     S.prepare(`CREATE TABLE IF NOT EXISTS lines_archive (
       uid TEXT NOT NULL, line INTEGER NOT NULL, item_id TEXT NOT NULL, qty INTEGER NOT NULL,
       unit_cents INTEGER NOT NULL, PRIMARY KEY (uid, line))`),
   ]);
+  // cơ sở tạo từ phiên bản trước: thêm cột còn thiếu (bỏ qua lỗi nếu đã có)
+  for (const [db, sql] of [[env.DB, 'ALTER TABLE orders ADD COLUMN service TEXT'], [S, 'ALTER TABLE orders_archive ADD COLUMN service TEXT']]) {
+    try { await db.prepare(sql).run(); } catch { /* đã có */ }
+  }
   schemaReady = true;
 }
 const statsDb = (env) => env.STATS || env.DB;
@@ -233,9 +240,9 @@ async function addEvent(env, kind, key) {
 }
 
 // ---------------------------------------------------------------- thực đơn (assets/menu.js) và combo (assets/formules.js)
-function parseAssigned(s, name) {
+function parseAssigned(s, name, open = '[', close = ']') {
   const i = s.indexOf(name);
-  return JSON.parse(s.slice(s.indexOf('[', i), s.lastIndexOf(']') + 1));
+  return JSON.parse(s.slice(s.indexOf(open, i), s.lastIndexOf(close) + 1));
 }
 let menuCache = { at: 0, data: null };
 async function loadMenu(env, req) {
@@ -247,43 +254,21 @@ async function loadMenu(env, req) {
   };
   const [ms, fs] = await Promise.all([get('/assets/menu.js'), get('/assets/formules.js').catch(() => '')]);
   const M = parseAssigned(ms, 'window.MENU');
-  const map = new Map();   // món đặt được (có giá, không ẩn)
-  const names = new Map(); // tên mọi món, kể cả combo
+  const map = new Map(); // món đặt được (có giá, không ẩn)
+  const all = new Map(); // mọi món, kể cả món ẩn và combo (lấy tên, giá nước tự thêm)
   for (const c of M) {
     for (const it of c.items || []) {
-      if (!it.id) continue;
-      if (!names.has(it.id)) names.set(it.id, { fr: (it.fr || [])[0] || it.id, vi: (it.vi || [])[0] || '' });
-      if (c.hide || it.hide || map.has(it.id)) continue;
+      if (!it.id || all.has(it.id)) continue;
       const cents = parsePrice(it.price);
-      if (cents == null) continue;
-      map.set(it.id, { id: it.id, cat: c.id, cents, ...names.get(it.id) });
+      const v = { id: it.id, cat: c.id, cents: cents || 0, fr: (it.fr || [])[0] || it.id, vi: (it.vi || [])[0] || '' };
+      all.set(it.id, v);
+      if (!c.hide && !it.hide && cents != null) map.set(it.id, v);
     }
   }
-  let formules = [];
-  try { if (fs) formules = parseAssigned(fs, 'window.FORMULES'); } catch (e) { console.error('formules.js', e); }
-  menuCache = { at: Date.now(), data: { map, names, formules } };
+  let cfg = {};
+  try { if (fs) cfg = parseAssigned(fs, 'window.FORMULES', '{', '}'); } catch (e) { console.error('formules.js', e); }
+  menuCache = { at: Date.now(), data: { map, all, cfg } };
   return menuCache.data;
-}
-
-// Tính số combo: mỗi combo cần 1 khai vị + 1 món chính; khai vị dùng lần lượt theo thứ tự combo.
-// Cùng thuật toán với assets/order.js (formulas).
-function formulaCounts(lines, map, formules) {
-  let starters = 0;
-  const out = [];
-  formules.forEach((f, k) => {
-    let s = 0, m = 0;
-    for (const l of lines) {
-      const it = map.get(l.id);
-      if (!it) continue;
-      if ((f.starters || []).includes(it.cat)) s += l.qty;
-      else if ((f.mains || []).includes(it.cat) && !(f.exclude || []).includes(l.id)) m += l.qty;
-    }
-    const avail = Math.max(0, s - starters);
-    const n = Math.min(avail, m);
-    starters += n;
-    out.push({ f, n });
-  });
-  return out;
 }
 
 // ---------------------------------------------------------------- nhận diện
@@ -361,34 +346,34 @@ async function apiOrder(req, env) {
   if (!st.open) return fail(st.reason, 409);
 
   // --- kiểm tra nội dung đơn
-  const { map: menu, names, formules } = await loadMenu(env, req);
+  const { map: menu, all, cfg } = await loadMenu(env, req);
   if (!Array.isArray(body.items) || !body.items.length || body.items.length > LIMITS.maxLines) return fail('items');
-  const lines = [];
+  const items = [];
   const seen = new Set();
-  let total = 0, count = 0;
+  let count = 0;
   for (const x of body.items) {
     const id = String((x && x.id) || '').slice(0, 80);
     const qty = Number(x && x.qty);
     const m = menu.get(id);
     if (!m || seen.has(id) || !Number.isInteger(qty) || qty < 1 || qty > LIMITS.maxQty) return fail('items');
     seen.add(id);
-    lines.push({ id, qty, cents: m.cents, fr: m.fr, vi: m.vi });
-    total += m.cents * qty;
+    items.push({ id, qty, cents: m.cents, cat: m.cat });
     count += qty;
   }
   if (count > LIMITS.maxItems) return fail('items');
-  // --- combo: tự thêm nước theo combo (khách có thể bỏ bớt qua body.decline)
+  const service = SERVICES.includes(body.service) ? body.service : null;
+  if (!service) return fail('service');
+  // --- nhóm món và combo: cùng phép tính với trang khách (assets/formule-calc.js)
   const decline = body.decline && typeof body.decline === 'object' ? body.decline : {};
-  for (const { f, n } of formulaCounts(lines, menu, formules)) {
-    const d = Math.min(n, Math.max(0, Number(decline[f.id]) | 0));
-    const q = n - d;
-    if (q <= 0) continue;
-    const drink = names.get(f.drink) || { fr: 'Boisson', vi: 'Nước' };
-    const fn = names.get(f.id) || { fr: f.id, vi: f.id };
-    const cents = Math.max(0, Number(f.drink_cents) | 0);
-    lines.push({ id: f.id, qty: q, cents, fr: `${drink.fr} · ${fn.fr}`, vi: `${drink.vi || drink.fr} · ${fn.vi || fn.fr}`, f: 1 });
-    total += cents * q;
-  }
+  const ad = all.get(cfg.auto_drink);
+  const calc = CALC.compute(cfg, items, decline, ad ? { id: ad.id, cents: ad.cents, cat: ad.cat } : null);
+  const lines = calc.lines.filter((l) => l.qty > 0).map((l) => {
+    const it = all.get(l.id) || { fr: l.id, vi: '' };
+    const f = l.fid ? all.get(l.fid) : null;
+    return { id: l.id, qty: l.qty, cents: l.cents, base: l.base, g: l.group, fr: it.fr, vi: it.vi,
+      ...(l.fid ? { fid: l.fid, ffr: f ? f.fr : l.fid, fvi: f ? f.vi : '', auto: l.auto ? 1 : 0 } : {}) };
+  });
+  const total = calc.total;
   const name = cleanText(body.name, LIMITS.nameLen);
   const note = cleanText(body.note, LIMITS.noteLen);
   const lang = LANGS.includes(body.lang) ? body.lang : 'fr';
@@ -413,9 +398,9 @@ async function apiOrder(req, env) {
   const no = +seq.v;
   const code = randomId(18);
   await env.DB.batch([
-    env.DB.prepare(`INSERT INTO orders(uid, code, day, no, created_at, status, items, total_cents, name, note, lang, device, iph)
-      VALUES (?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)`)
-      .bind(randomId(12), code, day, no, t0, JSON.stringify(lines), total, name || null, note || null, lang, dev, iph),
+    env.DB.prepare(`INSERT INTO orders(uid, code, day, no, created_at, status, items, total_cents, name, note, lang, service, device, iph)
+      VALUES (?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(randomId(12), code, day, no, t0, JSON.stringify(lines), total, name || null, note || null, lang, service, dev, iph),
     bumpRev(env),
   ]);
   return json({ ok: true, no, code, total });
@@ -496,7 +481,7 @@ async function apiStaffState(env, url) {
   if (url.searchParams.get('rev') === s.rev) return json({ ok: true, same: true, rev: s.rev, now: now() });
   const since = now() - LIMITS.keepSecs;
   const [o, b] = await env.DB.batch([
-    env.DB.prepare(`SELECT id, day, no, created_at, status, items, total_cents, name, note, lang, confirmed_at, done_at
+    env.DB.prepare(`SELECT id, day, no, created_at, status, items, total_cents, name, note, lang, service, confirmed_at, done_at
       FROM orders WHERE created_at > ? ORDER BY id DESC LIMIT 300`).bind(since),
     env.DB.prepare('SELECT key, until, reason FROM blocks WHERE until > ? ORDER BY until DESC LIMIT 100').bind(now()),
   ]);
@@ -572,8 +557,8 @@ async function apiStats(req, env, url) {
   const what = url.searchParams.get('what') === 'orders' ? 'orders' : 'lines';
   const S = statsDb(env);
   const sql = what === 'orders'
-    ? 'SELECT day, hm, weekday, no, status, n_items, total_cents, lang, confirm_secs, done_secs FROM orders_archive ORDER BY day, hm'
-    : `SELECT o.day, o.hm, o.weekday, o.status, o.lang, l.item_id, l.qty, l.unit_cents
+    ? 'SELECT day, hm, weekday, no, status, service, n_items, total_cents, lang, confirm_secs, done_secs FROM orders_archive ORDER BY day, hm'
+    : `SELECT o.day, o.hm, o.weekday, o.status, o.service, o.lang, l.item_id, l.qty, l.unit_cents
        FROM lines_archive l JOIN orders_archive o ON o.uid = l.uid ORDER BY o.day, o.hm`;
   const { results } = await S.prepare(sql).all();
   const cols = results.length ? Object.keys(results[0]) : [];
@@ -595,7 +580,7 @@ async function archive(env) {
   const cut = now() - LIMITS.keepSecs;
   for (let round = 0; round < 40; round++) {
     const { results } = await env.DB.prepare(
-      'SELECT uid, no, created_at, status, items, total_cents, lang, confirmed_at, done_at FROM orders WHERE created_at < ? ORDER BY id LIMIT 40',
+      'SELECT uid, no, created_at, status, items, total_cents, lang, service, confirmed_at, done_at FROM orders WHERE created_at < ? ORDER BY id LIMIT 40',
     ).bind(cut).all();
     if (!results.length) break;
     const stmts = [];
@@ -604,9 +589,9 @@ async function archive(env) {
       let items = [];
       try { items = JSON.parse(r.items); } catch { /* bỏ qua */ }
       const status = r.status === 'new' ? 'expired' : r.status;
-      stmts.push(S.prepare(`INSERT OR IGNORE INTO orders_archive(uid, day, hm, weekday, no, status, n_items, total_cents, lang, confirm_secs, done_secs)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
-        r.uid, p.day, p.hm, p.dow, r.no, status, items.reduce((a, x) => a + (x.qty || 0), 0), r.total_cents, r.lang,
+      stmts.push(S.prepare(`INSERT OR IGNORE INTO orders_archive(uid, day, hm, weekday, no, status, service, n_items, total_cents, lang, confirm_secs, done_secs)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+        r.uid, p.day, p.hm, p.dow, r.no, status, r.service || null, items.reduce((a, x) => a + (x.qty || 0), 0), r.total_cents, r.lang,
         r.confirmed_at ? r.confirmed_at - r.created_at : null, r.done_at ? r.done_at - r.created_at : null));
       items.forEach((x, k) => stmts.push(S.prepare(
         'INSERT OR IGNORE INTO lines_archive(uid, line, item_id, qty, unit_cents) VALUES (?, ?, ?, ?, ?)',

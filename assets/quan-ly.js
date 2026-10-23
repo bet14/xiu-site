@@ -67,15 +67,23 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&!$(
 
 // ---------------- hiển thị
 var LANG={fr:'FR',en:'EN',de:'DE',es:'ES',vi:'VI',zh:'中文',ko:'한국어'};
+var GROUPS=['entree','plat','banhmi','dessert','boisson','autre'],GNAME={entree:'Khai vị',plat:'Món chính',banhmi:'Bánh mì',dessert:'Tráng miệng',boisson:'Đồ uống',autre:'Khác'};
+var SVC={place:'Ăn tại chỗ · Sur place',emporter:'Mang đi · À emporter'};
+// xếp các dòng theo nhóm (đơn cũ không có nhóm → « Khác »)
+function grouped(items,row,head){
+ var g={};items.forEach(function(x){var k=GROUPS.indexOf(x.g)>=0?x.g:'autre';(g[k]=g[k]||[]).push(x);});
+ return GROUPS.filter(function(k){return g[k];}).map(function(k){return head(GNAME[k])+g[k].map(row).join('');}).join('');
+}
+function fTag(x){return x.fid?(x.fvi||x.ffr||'combo')+' · '+(x.cents?money(x.cents)+'/phần':'tặng')+(x.auto?' · tự thêm':''):'';}
 function card(o){
- var items=o.items.map(function(x){return '<li><span class="c-q">'+x.qty+'×</span><span class="c-n">'+esc(x.vi||x.fr)+(x.vi&&x.fr?'<small>'+esc(x.fr)+'</small>':'')+'</span><span class="c-p">'+money(x.cents*x.qty)+'</span></li>';}).join('');
+ var items=grouped(o.items,function(x){return '<li><span class="c-q">'+x.qty+'×</span><span class="c-n">'+esc(x.vi||x.fr)+(x.vi&&x.fr?'<small>'+esc(x.fr)+'</small>':'')+(x.fid?'<em class="c-f">'+esc(fTag(x))+'</em>':'')+'</span><span class="c-p">'+(x.base>x.cents?'<s>'+money(x.base*x.qty)+'</s> ':'')+(x.cents?money(x.cents*x.qty):'0 €')+'</span></li>';},function(n){return '<li class="c-gh">'+esc(n)+'</li>';});
  var btn={
   'new':'<button class="b b-green" data-act="confirmed">Xác nhận</button><button class="b b-out" data-act="print">In</button><button class="b b-red-out" data-act="cancelled">Hủy</button>',
   confirmed:'<button class="b b-green" data-act="done">Xong</button><button class="b b-out" data-act="print">In</button><button class="b b-out" data-act="new">↩ Chờ</button><button class="b b-red-out" data-act="cancelled">Hủy</button>'
  }[o.status]||'<button class="b b-out" data-act="new">Khôi phục</button><button class="b b-out" data-act="print">In</button>';
  var st={done:'Xong',cancelled:'Đã hủy',expired:'Hết hạn (không ai xác nhận)'}[o.status];
  return '<article class="card s-'+esc(o.status)+(S.fresh&&S.fresh.indexOf(o.id)>=0?' fresh':'')+'" data-id="'+o.id+'">'
-  +'<div class="c-head"><span class="c-no">'+o.no+'</span>'+(o.name?'<span class="c-name">'+esc(o.name)+'</span>':'')
+  +'<div class="c-head"><span class="c-no">'+o.no+'</span>'+(o.service?'<span class="c-svc s-'+esc(o.service)+'">'+esc(SVC[o.service]||o.service)+'</span>':'')+(o.name?'<span class="c-name">'+esc(o.name)+'</span>':'')
   +'<span class="c-time" data-ts="'+o.created_at+'">'+hm(o.created_at)+' · '+ago(o.created_at)+'<span class="c-tag">'+esc(LANG[o.lang]||o.lang||'')+'</span>'+(st?'<span class="c-tag">'+st+'</span>':'')+'</span></div>'
   +'<ul class="c-items">'+items+'</ul>'+(o.note?'<div class="c-note">'+esc(o.note)+'</div>':'')
   +'<div class="c-foot"><span class="c-total">'+money(o.total_cents)+'</span>'+btn+'</div></article>';
@@ -115,8 +123,8 @@ $$('.mode button').forEach(function(b){b.addEventListener('click',function(){
 // ---------------- in
 function pageStyle(css){var s=$('#page-style');if(!s){s=document.createElement('style');s.id='page-style';document.head.appendChild(s);}s.textContent=css;}
 function printTicket(o){
- var rows=o.items.map(function(x){return '<tr><td class="q">'+x.qty+'×</td><td>'+esc(x.vi||x.fr)+(x.vi&&x.fr?'<div class="fr">'+esc(x.fr)+'</div>':'')+'</td><td class="p">'+money(x.cents*x.qty)+'</td></tr>';}).join('');
- $('#print').innerHTML='<div class="tk"><h1>XÍU</h1><div class="no">N° '+o.no+'</div><div class="meta">'+esc(o.day)+' · '+hm(o.created_at)+(o.name?' · '+esc(o.name):'')+'</div>'
+ var rows=grouped(o.items,function(x){return '<tr><td class="q">'+x.qty+'×</td><td>'+esc(x.vi||x.fr)+(x.vi&&x.fr?'<div class="fr">'+esc(x.fr)+'</div>':'')+(x.fid?'<div class="fr">'+esc(fTag(x))+'</div>':'')+'</td><td class="p">'+(x.cents?money(x.cents*x.qty):'0 €')+'</td></tr>';},function(n){return '<tr><td colspan="3" class="gh">'+esc(n)+'</td></tr>';});
+ $('#print').innerHTML='<div class="tk"><h1>XÍU</h1><div class="no">N° '+o.no+'</div>'+(o.service?'<div class="svc">'+esc(o.service==='emporter'?'À EMPORTER':'SUR PLACE')+'</div>':'')+'<div class="meta">'+esc(o.day)+' · '+hm(o.created_at)+(o.name?' · '+esc(o.name):'')+'</div>'
   +'<table>'+rows+'</table>'+(o.note?'<div class="note">'+esc(o.note)+'</div>':'')+'<div class="tot">'+money(o.total_cents)+'</div></div>';
  pageStyle('@page{size:80mm auto;margin:3mm}');document.body.className='p-ticket';window.print();document.body.className='';
 }

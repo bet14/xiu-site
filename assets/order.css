@@ -92,3 +92,14 @@ body.has-obar .mbar{display:none}
 .oq{right:-2px}
 .dwrap.has-img .dadd{right:6px;bottom:22px;width:42px;height:42px}
 }
+
+/* nhóm món, giá gạch, ăn tại chỗ / mang đi */
+.oc-list li.o-gh,.od-list li.o-gh{display:block;padding:14px 0 4px;border-bottom:0;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.4px;text-transform:uppercase;color:var(--orange);text-align:left}
+.oc-name s,.oc-sum s,.od-p s{color:var(--muted);font-weight:400;font-size:.88em;margin-right:2px}
+.oc-svc{margin:16px 0 0;padding:12px;border-radius:14px;background:#F7F4F0;border:2px solid transparent}
+.oc-svc.need{border-color:var(--red);background:var(--pink)}
+.oc-svc>span{display:block;font-weight:800;margin-bottom:8px}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg2 button{font:inherit;font-weight:800;font-size:16px;min-height:50px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.seg2 button[aria-checked=true]{background:var(--green);border-color:var(--green);color:#fff}
+.od-svc{display:inline-block;margin-top:10px;padding:6px 14px;border-radius:999px;background:var(--ink);color:#fff;font-weight:800}
