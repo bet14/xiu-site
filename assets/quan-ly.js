@@ -157,12 +157,13 @@ $('#logout-all').addEventListener('click',function(){if(!confirm('Đăng xuất 
 
 // ---------------- nhập đơn tại quầy (khách không dùng điện thoại)
 var CFG=window.FORMULES||{},CALC=window.XIU_CALC,MENU=window.MENU||[];
+function pAvail(it){if(!it.days)return true;var w=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',weekday:'short'}).format(new Date());return it.days.indexOf({Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[w])>=0;}
 var P={cart:{},decl:{},svc:null,cat:'all',q:''},PITEMS={},PCAT={},PALL={};
 function pcents(p){var m=/(\d+)(?:[.,](\d{1,2}))?/.exec(String(p||''));if(!m)return null;var c=+m[1]*100+(m[2]?+((m[2]+'0').slice(0,2)):0);return c>0?c:null;}
 function nm(it,l){return ((it[l]||[])[0])||((it.fr||[])[0])||it.id;}
 function fold(x){return String(x||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();}
 function pimg(n){return 'assets/img/menu/'+(n.indexOf('.')>0?n:n+'.webp');}
-MENU.forEach(function(c){(c.items||[]).forEach(function(it){if(!it.id)return;if(!PALL[it.id])PALL[it.id]={it:it,cat:c.id};if(c.hide||it.hide||PITEMS[it.id]||!pcents(it.price))return;PITEMS[it.id]=it;PCAT[it.id]=c.id;});});
+MENU.forEach(function(c){(c.items||[]).forEach(function(it){if(!it.id)return;if(!PALL[it.id])PALL[it.id]={it:it,cat:c.id};if(c.hide||it.hide||PITEMS[it.id]||!pcents(it.price)||!pAvail(it))return;PITEMS[it.id]=it;PCAT[it.id]=c.id;});});
 function pcalc(){
  var items=[];Object.keys(P.cart).forEach(function(id){var it=PITEMS[id];if(it&&P.cart[id]>0)items.push({id:id,qty:P.cart[id],cents:pcents(it.price),cat:PCAT[id]});});
  var a=PALL[CFG.auto_drink];

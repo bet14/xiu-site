@@ -264,7 +264,8 @@ async function loadMenu(env, req) {
     for (const it of c.items || []) {
       if (!it.id || all.has(it.id)) continue;
       const cents = parsePrice(it.price);
-      const v = { id: it.id, cat: c.id, cents: cents || 0, fr: (it.fr || [])[0] || it.id, vi: (it.vi || [])[0] || '' };
+      const v = { id: it.id, cat: c.id, cents: cents || 0, fr: (it.fr || [])[0] || it.id, vi: (it.vi || [])[0] || '',
+        days: Array.isArray(it.days) ? it.days : null };
       all.set(it.id, v);
       if (!c.hide && !it.hide && cents != null) map.set(it.id, v);
     }
@@ -346,6 +347,7 @@ async function buildOrder(env, req, body, defLang = 'fr') {
     const id = String((x && x.id) || '').slice(0, 80);
     const qty = Number(x && x.qty);
     const m = menu.get(id);
+    if (m && m.days && !m.days.includes(parisParts(now()).dow)) return { err: 'items' }; // món không bán hôm nay
     if (!m || seen.has(id) || !Number.isInteger(qty) || qty < 1 || qty > LIMITS.maxQty) return { err: 'items' };
     seen.add(id);
     items.push({ id, qty, cents: m.cents, cat: m.cat });

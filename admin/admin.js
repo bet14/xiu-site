@@ -10,6 +10,9 @@ function $(s,r){return (r||document).querySelector(s);}
 function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function clone(o){return JSON.parse(JSON.stringify(o));}
+// ngày trong tuần: 1 = Thứ 2 … 6 = Thứ 7, 0 = Chủ nhật
+var DAYS=[[1,'T2'],[2,'T3'],[3,'T4'],[4,'T5'],[5,'T6'],[6,'T7'],[0,'CN']];
+function daysLabel(ds){if(!ds.length)return 'không ngày nào';return DAYS.filter(function(d){return ds.indexOf(d[0])>=0;}).map(function(d){return d[1];}).join(' ');}
 function slug(s){s=String(s||'').replace(/œ/g,'oe').replace(/Œ/g,'oe').replace(/æ/g,'ae').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);return s;}
 function imgUrl(n){return '../assets/img/menu/'+(n.indexOf('.')>0?n:n+'.webp');}
 function toast(msg,err){var t=$('#toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='toast';},err?6000:2800);}
@@ -31,6 +34,7 @@ function normalize(src){
   (c.items||[]).forEach(function(it){
    var o={id:'',icon:it.icon||'',img:it.img||'',price:it.price||'',veg:!!it.veg};
    if(it.badge)o.badge=it.badge;if(it.hide)o.hide=true;
+   if(Array.isArray(it.days)&&it.days.length<7)o.days=it.days.filter(function(d){return d>=0&&d<=6;});
    LANGS.forEach(function(l){o[l]=normLang(it[l]);});
    MENU[ci].items.push(o);
    o.id=uniqueItemId(it.id||(o.fr[0]),o);
@@ -98,7 +102,7 @@ function renderItems(){
   return '<li class="row'+(i===selItem?' on':'')+(it.hide?' off':'')+'" draggable="true" data-idx="'+i+'"><span class="h" title="Kéo để đổi thứ tự">⋮⋮</span>'
   +'<span class="thumb">'+(it.img?'<img src="'+esc(imgUrl(it.img))+'" alt="" loading="lazy">':'không ảnh')+'</span>'
   +'<span class="t"><b>'+esc((it.icon?it.icon+' ':'')+(it.fr[0]||'(chưa đặt tên)'))+'</b><small>'+esc(it.price||'— chưa có giá')+(it.vi[0]?' · '+esc(it.vi[0]):'')+'</small>'
-  +'<small>'+(it.veg?'<span class="tag veg">chay</span>':'')+(b?'<span class="tag badge">'+esc(b)+'</span>':'')+(it.hide?'<span class="tag hide">đang ẩn</span>':'')+'</small></span>'
+  +'<small>'+(it.veg?'<span class="tag veg">chay</span>':'')+(b?'<span class="tag badge">'+esc(b)+'</span>':'')+(it.hide?'<span class="tag hide">đang ẩn</span>':'')+(it.days?'<span class="tag days">'+esc(daysLabel(it.days))+'</span>':'')+'</small></span>'
   +'<span class="mv"><button data-mv="-1" title="Lên">▲</button><button data-mv="1" title="Xuống">▼</button></span></li>';
  }).join('')||'<li class="empty">Danh mục này chưa có món.</li>';
  $$('.row',ol).forEach(function(r){var i=+r.dataset.idx;
@@ -121,6 +125,9 @@ function renderEditor(){
  +'<label class="f"><span>Biểu tượng</span><input type="text" data-f="icon" value="'+esc(it.icon)+'" maxlength="8"></label>'
  +'<label class="f"><span>Nhãn</span><select data-f="badge">'+BADGES.map(function(b){return '<option value="'+b[0]+'"'+((it.badge||'')===b[0]?' selected':'')+'>'+esc(b[1])+'</option>';}).join('')+'</select></label></div>'
  +'<div class="checks"><label><input type="checkbox" data-f="veg"'+(it.veg?' checked':'')+'> Món chay (tự hiện thêm trong mục Veggie)</label><label><input type="checkbox" data-f="hide"'+(it.hide?' checked':'')+'> Tạm ẩn (hết hàng)</label></div>'
+ +'<div class="f days"><span>Ngày bán (bỏ chọn ngày nào thì hôm đó món không hiện trên menu và không đặt được)</span><div class="checks">'
+ +DAYS.map(function(d){return '<label><input type="checkbox" data-day="'+d[0]+'"'+(!it.days||it.days.indexOf(d[0])>=0?' checked':'')+'> '+d[1]+'</label>';}).join('')
+ +'</div><small class="days-warn"'+(it.days&&!it.days.length?'':' hidden')+'>Không chọn ngày nào: món sẽ không bao giờ hiện.</small></div>'
  +'<label class="f"><span>Thuộc danh mục</span><select id="it-cat">'+MENU.map(function(c,i){return '<option value="'+i+'"'+(i===selCat?' selected':'')+'>'+esc((c.icon?c.icon+' ':'')+(c.title.fr||c.id))+'</option>';}).join('')+'</select></label>'
  +LANGS.map(function(l){return '<div class="lang"><h3>'+LNAME[l]+'</h3><label class="f"><span>Tên món</span><input type="text" data-l="'+l+'" data-n="0" value="'+esc(it[l][0])+'"></label><label class="f"><span>Mô tả (hiện khi khách bấm vào món)</span><textarea rows="3" data-l="'+l+'" data-n="1">'+esc(it[l][1])+'</textarea></label></div>';}).join('')
  +'<label class="f" style="margin-top:10px"><span>Mã món (không dấu; dùng cho đặt món sau này)</span><input type="text" id="it-id" value="'+esc(it.id)+'"></label>'
@@ -132,6 +139,12 @@ function renderEditor(){
   else if(k==='badge'){if(el.value)it.badge=el.value;else delete it.badge;}
   else it[k]=el.value;
   update();paintPreview();
+ });});
+ $$('[data-day]',box).forEach(function(el){el.addEventListener('change',function(){
+  var d=$$('[data-day]',box).filter(function(x){return x.checked;}).map(function(x){return +x.dataset.day;}).sort();
+  if(d.length===7)delete it.days;else it.days=d;
+  var w=$('.days-warn',box);if(w)w.hidden=!(it.days&&!it.days.length);
+  update();
  });});
  $$('[data-l]',box).forEach(function(el){el.addEventListener('input',function(){
   it[el.dataset.l][+el.dataset.n]=el.value;

@@ -52,7 +52,7 @@ try{
 
 // ---------- thực đơn: id → món, id → danh mục; mọi món (kể cả combo) để lấy tên
 var ITEMS={},CAT={},ALL={};
-(window.MENU||[]).forEach(function(c){(c.items||[]).forEach(function(it){if(!it.id)return;if(!ALL[it.id])ALL[it.id]=it;if(c.hide||it.hide||ITEMS[it.id])return;ITEMS[it.id]=it;CAT[it.id]=c.id;});});
+(window.MENU||[]).forEach(function(c){(c.items||[]).forEach(function(it){if(!it.id)return;if(!ALL[it.id])ALL[it.id]=it;if(c.hide||it.hide||ITEMS[it.id]||(X.avail&&!X.avail(it)))return;ITEMS[it.id]=it;CAT[it.id]=c.id;});});
 function priceOf(it){return it?cents(it.price):null;}
 var CFG=window.FORMULES||{},CALC=window.XIU_CALC;
 var FORM=CFG.formules||[];
