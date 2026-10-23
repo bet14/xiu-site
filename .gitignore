@@ -1,2 +1,7 @@
 admin/backups/
 __pycache__/
+dist/
+.wrangler/
+.dev.vars
+node_modules/
+.tools/

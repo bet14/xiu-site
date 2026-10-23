@@ -16,6 +16,12 @@ function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAl
 function pick(o){if(!o)return '';if(o[lang])return o[lang];var f=fb();for(var i=0;i<f.length;i++)if(o[f[i]])return o[f[i]];return '';}
 function txt(it){var t=it[lang]||['',''],f=fb(),r=[t[0]||'',t[1]||''];for(var i=0;i<f.length;i++){var o=it[f[i]];if(!o)continue;if(!r[0]&&o[0])r[0]=o[0];if(!r[1]&&!t[0]&&o[1])r[1]=o[1];}return r;}
 function imgSrc(n){return 'assets/img/menu/'+(n.indexOf('.')>0?n:n+'.webp');}
+// dùng chung với assets/order.js (đặt món tại tiệm)
+// món chỉ bán vài ngày trong tuần (trường days trong menu.js, 0 = Chủ nhật) → ngày khác thì ẩn
+function parisDow(){try{var w=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',weekday:'short'}).format(new Date());return {Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[w];}catch(e){return new Date().getDay();}}
+function avail(it){return !it.days||it.days.indexOf(parisDow())>=0;}
+window.XIU={lang:function(){return lang;},txt:txt,T:T,esc:esc,img:imgSrc,avail:avail};
+function hook(n,a,b){var o=window.XIU_ORDER;if(o&&o[n])o[n](a,b);}
 
 // ---------- en-tête ----------
 $$('.tabs a').forEach(function(a){if(a.dataset.p===page)a.setAttribute('aria-current','page');});
@@ -63,7 +69,7 @@ function badgeHtml(it){return it.badge?'<span class="mbadge '+esc(it.badge)+'">'
 function viSub(it){return lang==='vi'||!it.vi?'':(it.vi[0]||'');}
 function catsToShow(){
  var cats=(window.MENU||[]).filter(function(c){return !c.hide;}),vegs=[];
- cats.forEach(function(c){(c.items||[]).forEach(function(it){if(it.veg&&!it.hide)vegs.push(it);});});
+ cats.forEach(function(c){(c.items||[]).forEach(function(it){if(it.veg&&!it.hide&&avail(it))vegs.push(it);});});
  var out=cats.slice();
  if(vegs.length)out.push({id:'veggie',icon:'🥬',title:{fr:'Veggie',en:'Veggie',de:'Veggie',es:'Veggie',vi:'Món chay',zh:'素食',ko:'채식'},items:vegs});
  return vegOnly?out.filter(function(c){return c.id==='veggie';}):out;
@@ -74,8 +80,8 @@ function renderMenu(){
  catsToShow().forEach(function(c){
   var rows='',n=0;
   (c.items||[]).forEach(function(it){
-   if(it.hide)return;n++;var k=FLAT.push(it)-1,t=txt(it),sub=viSub(it);
-   rows+='<button type="button" class="dish" data-k="'+k+'"><span class="dt">'
+   if(it.hide||!avail(it))return;n++;var k=FLAT.push(it)-1,t=txt(it),sub=viSub(it);
+   rows+='<button type="button" class="dish" data-k="'+k+'" data-id="'+esc(it.id||'')+'"><span class="dt">'
     +'<span class="dn">'+(it.icon?'<span class="ic" aria-hidden="true">'+esc(it.icon)+'</span>':'')+esc(t[0])+'</span>'
     +(sub?'<span class="vi">'+esc(sub)+'</span>':'')
     +(it.price||it.veg?'<span class="p">'+esc(it.price)+(it.veg?'<span class="veg">'+esc(T('veg'))+'</span>':'')+'</span>':'')
@@ -97,7 +103,7 @@ function renderMenu(){
   el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
   if(history.replaceState)history.replaceState(null,'','#cat-'+a.dataset.c);
  });});
- spy();
+ spy();hook('onRender');
 }
 var lockSpy=0;
 function markCat(id){
@@ -127,6 +133,7 @@ function openDish(it){
  $('.md-price',d).textContent=[it.price,it.veg?T('veg'):''].filter(Boolean).join(' · ');
  $('.md-desc',d).textContent=t[1];
  $('.md-call span',d).textContent=T('call');
+ hook('onOpen',it,d);
  if(d.showModal)d.showModal();else d.setAttribute('open','');
  d.scrollTop=0;
 }

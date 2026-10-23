@@ -116,3 +116,7 @@ textarea{resize:vertical;min-height:60px}
 .howto ol{padding-left:20px;font-size:13px}
 .howto li{margin:4px 0}
 .btn:disabled{opacity:.45;cursor:default}
+
+.tag.days{background:#E8F5E1;color:#2E7D32}
+.f.days .checks{margin:6px 0 4px}
+.days-warn{color:#D62F23;font-weight:700}

@@ -100,6 +100,12 @@ def clean_menu(menu):
                 item["badge"] = badge
             if it.get("hide"):
                 item["hide"] = True
+            # ngày bán trong tuần (0 = Chủ nhật … 6 = Thứ bảy); không có = bán mọi ngày
+            days = it.get("days")
+            if isinstance(days, list):
+                d = sorted({x for x in days if isinstance(x, int) and not isinstance(x, bool) and 0 <= x <= 6})
+                if len(d) < 7:
+                    item["days"] = d
             for l in LANGS:
                 item[l] = clean_lang(it.get(l))
             items.append(item)
