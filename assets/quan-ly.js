@@ -132,6 +132,7 @@ function renderSettings(){
  if(!S.orderUrl)return;
  if($('#qr').dataset.url!==S.orderUrl){$('#qr').innerHTML=qrSvg(S.orderUrl,4);$('#qr').dataset.url=S.orderUrl;}
  $('#qr-url').textContent=S.orderUrl;
+ $('#open-customer').href=S.orderUrl;
  var why={rate:'gửi quá 5 đơn / 10 phút',devices:'quá nhiều thiết bị mới từ một mạng',login:'nhập sai mật khẩu nhiều lần'};
  $('#blocks').innerHTML=(S.blocks||[]).map(function(b){return '<div class="blk"><span>'+(b.kind==='dev'?'Thiết bị':b.kind==='ip'?'Mạng (IP)':'Đăng nhập')+' · '+esc(why[b.reason]||b.reason)+' · còn '+mins(b.until)+' phút</span><button class="b b-out" data-unblock="'+esc(b.key)+'">Mở khóa</button></div>';}).join('')||'<p class="hint">Không có.</p>';
 }

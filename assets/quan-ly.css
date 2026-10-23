@@ -5,6 +5,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro'
 h1,h2,h3{font-family:'Baloo 2','Be Vietnam Pro',sans-serif;font-weight:800;margin:0}
 .b{font:inherit;font-weight:700;border-radius:12px;min-height:44px;padding:0 16px;border:2px solid transparent;cursor:pointer;background:#fff;color:var(--ink)}
 .b-green{background:var(--green);color:#fff}
+a.b{display:inline-flex;align-items:center;text-decoration:none}
 .b-red{background:var(--red);color:#fff}
 .b-out{border-color:var(--line)}
 .b-red-out{border-color:var(--red);color:var(--red)}
