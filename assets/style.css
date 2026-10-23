@@ -194,3 +194,7 @@ html{scroll-padding-top:calc(var(--hh) + 16px)}
 .mside{top:var(--hh)}
 .mcat{scroll-margin-top:60px}
 }
+/* Cette semaine : khung ảnh vuông, thấy trọn món */
+.week .card img{height:auto;aspect-ratio:1/1;object-fit:cover;background:var(--yl)}
+.week{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+@media(min-width:1000px){.week .card{flex-direction:row;align-items:stretch}.week .card img{width:48%;flex:0 0 48%}.week .card .body{justify-content:center}}
