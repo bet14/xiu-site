@@ -164,7 +164,7 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL UNIQUE, code TEXT NOT NULL UNIQUE,
       day TEXT NOT NULL, no INTEGER NOT NULL, created_at INTEGER NOT NULL, status TEXT NOT NULL,
-      items TEXT NOT NULL, total_cents INTEGER NOT NULL, name TEXT, note TEXT, lang TEXT, service TEXT,
+      items TEXT NOT NULL, total_cents INTEGER NOT NULL, name TEXT, note TEXT, lang TEXT, service TEXT, src TEXT,
       device TEXT NOT NULL, iph TEXT NOT NULL, confirmed_at INTEGER, done_at INTEGER)`),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_dev ON orders(device, created_at)'),
     env.DB.prepare('CREATE INDEX IF NOT EXISTS ix_orders_ip ON orders(iph, created_at)'),
@@ -179,14 +179,15 @@ async function ensureSchema(env) {
   await S.batch([
     S.prepare(`CREATE TABLE IF NOT EXISTS orders_archive (
       uid TEXT PRIMARY KEY, day TEXT NOT NULL, hm TEXT NOT NULL, weekday INTEGER NOT NULL, no INTEGER,
-      status TEXT NOT NULL, n_items INTEGER NOT NULL, total_cents INTEGER NOT NULL, lang TEXT, service TEXT,
+      status TEXT NOT NULL, n_items INTEGER NOT NULL, total_cents INTEGER NOT NULL, lang TEXT, service TEXT, src TEXT,
       confirm_secs INTEGER, done_secs INTEGER)`),
     S.prepare(`CREATE TABLE IF NOT EXISTS lines_archive (
       uid TEXT NOT NULL, line INTEGER NOT NULL, item_id TEXT NOT NULL, qty INTEGER NOT NULL,
       unit_cents INTEGER NOT NULL, PRIMARY KEY (uid, line))`),
   ]);
   // cơ sở tạo từ phiên bản trước: thêm cột còn thiếu (bỏ qua lỗi nếu đã có)
-  for (const [db, sql] of [[env.DB, 'ALTER TABLE orders ADD COLUMN service TEXT'], [S, 'ALTER TABLE orders_archive ADD COLUMN service TEXT']]) {
+  for (const [db, sql] of [[env.DB, 'ALTER TABLE orders ADD COLUMN service TEXT'], [env.DB, 'ALTER TABLE orders ADD COLUMN src TEXT'],
+    [S, 'ALTER TABLE orders_archive ADD COLUMN service TEXT'], [S, 'ALTER TABLE orders_archive ADD COLUMN src TEXT']]) {
     try { await db.prepare(sql).run(); } catch { /* đã có */ }
   }
   schemaReady = true;
@@ -331,23 +332,10 @@ async function apiSession(req, env, url) {
   }, 200, headers);
 }
 
-async function apiOrder(req, env) {
-  const body = await readJson(req);
-  const s = await settings(env);
-  if (!body.t || !(await safeEq(String(body.t).slice(0, 40), s.token))) return fail('token', 403);
-  const dev = await readDevice(req, env);
-  if (!dev) return fail('device', 403);
-  const ip = ipOf(req);
-  const iph = await ipHash(env, ip);
-
-  let until = (await blockedUntil(env, 'ip:' + iph)) || (await blockedUntil(env, 'dev:' + dev));
-  if (until) return fail('blocked', 429, { until });
-  const st = orderState(s);
-  if (!st.open) return fail(st.reason, 409);
-
-  // --- kiểm tra nội dung đơn
+// Kiểm tra nội dung đơn và tính tiền (dùng cho cả đơn khách và đơn nhân viên nhập)
+async function buildOrder(env, req, body, defLang = 'fr') {
   const { map: menu, all, cfg } = await loadMenu(env, req);
-  if (!Array.isArray(body.items) || !body.items.length || body.items.length > LIMITS.maxLines) return fail('items');
+  if (!Array.isArray(body.items) || !body.items.length || body.items.length > LIMITS.maxLines) return { err: 'items' };
   const items = [];
   const seen = new Set();
   let count = 0;
@@ -355,15 +343,15 @@ async function apiOrder(req, env) {
     const id = String((x && x.id) || '').slice(0, 80);
     const qty = Number(x && x.qty);
     const m = menu.get(id);
-    if (!m || seen.has(id) || !Number.isInteger(qty) || qty < 1 || qty > LIMITS.maxQty) return fail('items');
+    if (!m || seen.has(id) || !Number.isInteger(qty) || qty < 1 || qty > LIMITS.maxQty) return { err: 'items' };
     seen.add(id);
     items.push({ id, qty, cents: m.cents, cat: m.cat });
     count += qty;
   }
-  if (count > LIMITS.maxItems) return fail('items');
+  if (count > LIMITS.maxItems) return { err: 'items' };
   const service = SERVICES.includes(body.service) ? body.service : null;
-  if (!service) return fail('service');
-  // --- nhóm món và combo: cùng phép tính với trang khách (assets/formule-calc.js)
+  if (!service) return { err: 'service' };
+  // nhóm món và combo: cùng phép tính với trang khách (assets/formule-calc.js)
   const decline = body.decline && typeof body.decline === 'object' ? body.decline : {};
   const ad = all.get(cfg.auto_drink);
   const calc = CALC.compute(cfg, items, decline, ad ? { id: ad.id, cents: ad.cents, cat: ad.cat } : null);
@@ -373,11 +361,46 @@ async function apiOrder(req, env) {
     return { id: l.id, qty: l.qty, cents: l.cents, base: l.base, g: l.group, fr: it.fr, vi: it.vi,
       ...(l.fid ? { fid: l.fid, ffr: f ? f.fr : l.fid, fvi: f ? f.vi : '', auto: l.auto ? 1 : 0 } : {}) };
   });
-  const total = calc.total;
-  const name = cleanText(body.name, LIMITS.nameLen);
-  const note = cleanText(body.note, LIMITS.noteLen);
-  const lang = LANGS.includes(body.lang) ? body.lang : 'fr';
+  return {
+    lines, total: calc.total, service,
+    name: cleanText(body.name, LIMITS.nameLen), note: cleanText(body.note, LIMITS.noteLen),
+    lang: LANGS.includes(body.lang) ? body.lang : defLang,
+  };
+}
 
+async function insertOrder(env, o, { dev, iph, status, src }) {
+  const t0 = now();
+  const day = parisParts(t0).day;
+  const seq = await env.DB.prepare(`INSERT INTO settings(k, v) VALUES (?, '1')
+    ON CONFLICT(k) DO UPDATE SET v = CAST(v AS INTEGER) + 1 RETURNING v`).bind('seq:' + day).first();
+  const no = +seq.v;
+  const code = randomId(18);
+  await env.DB.batch([
+    env.DB.prepare(`INSERT INTO orders(uid, code, day, no, created_at, status, items, total_cents, name, note, lang, service, src, device, iph, confirmed_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(randomId(12), code, day, no, t0, status, JSON.stringify(o.lines), o.total, o.name || null, o.note || null,
+        o.lang, o.service, src, dev, iph, status === 'confirmed' ? t0 : null),
+    bumpRev(env),
+  ]);
+  return { no, code };
+}
+
+async function apiOrder(req, env) {
+  const body = await readJson(req);
+  const s = await settings(env);
+  if (!body.t || !(await safeEq(String(body.t).slice(0, 40), s.token))) return fail('token', 403);
+  const dev = await readDevice(req, env);
+  if (!dev) return fail('device', 403);
+  const ip = ipOf(req);
+  const iph = await ipHash(env, ip);
+
+  const until = (await blockedUntil(env, 'ip:' + iph)) || (await blockedUntil(env, 'dev:' + dev));
+  if (until) return fail('blocked', 429, { until });
+  const st = orderState(s);
+  if (!st.open) return fail(st.reason, 409);
+
+  const o = await buildOrder(env, req, body);
+  if (o.err) return fail(o.err);
   if (!(await verifyTurnstile(env, body.ts, ip))) return fail('robot', 403);
 
   // --- giới hạn tần suất (đếm chính xác trong D1)
@@ -391,19 +414,17 @@ async function apiOrder(req, env) {
   if (i.results[0].n >= LIMITS.ipOrders) return fail('blocked', 429, { until: await block(env, 'ip:' + iph, 'rate') });
   if (p.results[0].n >= LIMITS.maxPending) return fail('busy', 503);
 
-  // --- số đơn trong ngày
-  const day = parisParts(t0).day;
-  const seq = await env.DB.prepare(`INSERT INTO settings(k, v) VALUES (?, '1')
-    ON CONFLICT(k) DO UPDATE SET v = CAST(v AS INTEGER) + 1 RETURNING v`).bind('seq:' + day).first();
-  const no = +seq.v;
-  const code = randomId(18);
-  await env.DB.batch([
-    env.DB.prepare(`INSERT INTO orders(uid, code, day, no, created_at, status, items, total_cents, name, note, lang, service, device, iph)
-      VALUES (?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .bind(randomId(12), code, day, no, t0, JSON.stringify(lines), total, name || null, note || null, lang, service, dev, iph),
-    bumpRev(env),
-  ]);
-  return json({ ok: true, no, code, total });
+  const { no, code } = await insertOrder(env, o, { dev, iph, status: 'new', src: 'qr' });
+  return json({ ok: true, no, code, total: o.total });
+}
+
+// Đơn do nhân viên nhập tại quầy: không cần mã QR, không giới hạn tần suất, không theo giờ mở cửa; xác nhận luôn
+async function apiStaffNewOrder(req, env) {
+  const body = await readJson(req);
+  const o = await buildOrder(env, req, body, 'vi');
+  if (o.err) return fail(o.err);
+  const { no } = await insertOrder(env, o, { dev: 'staff', iph: 'staff', status: 'confirmed', src: 'staff' });
+  return json({ ok: true, no, total: o.total });
 }
 
 async function apiStatus(env, url) {
@@ -481,7 +502,7 @@ async function apiStaffState(env, url) {
   if (url.searchParams.get('rev') === s.rev) return json({ ok: true, same: true, rev: s.rev, now: now() });
   const since = now() - LIMITS.keepSecs;
   const [o, b] = await env.DB.batch([
-    env.DB.prepare(`SELECT id, day, no, created_at, status, items, total_cents, name, note, lang, service, confirmed_at, done_at
+    env.DB.prepare(`SELECT id, day, no, created_at, status, items, total_cents, name, note, lang, service, src, confirmed_at, done_at
       FROM orders WHERE created_at > ? ORDER BY id DESC LIMIT 300`).bind(since),
     env.DB.prepare('SELECT key, until, reason FROM blocks WHERE until > ? ORDER BY until DESC LIMIT 100').bind(now()),
   ]);
@@ -519,6 +540,7 @@ async function apiStaff(req, env, url, path) {
   if (path === '/api/staff/state' && req.method === 'GET') return apiStaffState(env, url);
   if (req.method !== 'POST') return fail('method', 405);
   if (path === '/api/staff/order') return apiStaffOrder(req, env);
+  if (path === '/api/staff/orders') return apiStaffNewOrder(req, env);
   if (path === '/api/staff/mode') {
     const { mode } = await readJson(req);
     if (!['auto', 'open', 'paused'].includes(mode)) return fail('bad');
@@ -557,8 +579,8 @@ async function apiStats(req, env, url) {
   const what = url.searchParams.get('what') === 'orders' ? 'orders' : 'lines';
   const S = statsDb(env);
   const sql = what === 'orders'
-    ? 'SELECT day, hm, weekday, no, status, service, n_items, total_cents, lang, confirm_secs, done_secs FROM orders_archive ORDER BY day, hm'
-    : `SELECT o.day, o.hm, o.weekday, o.status, o.service, o.lang, l.item_id, l.qty, l.unit_cents
+    ? 'SELECT day, hm, weekday, no, status, service, src, n_items, total_cents, lang, confirm_secs, done_secs FROM orders_archive ORDER BY day, hm'
+    : `SELECT o.day, o.hm, o.weekday, o.status, o.service, o.src, o.lang, l.item_id, l.qty, l.unit_cents
        FROM lines_archive l JOIN orders_archive o ON o.uid = l.uid ORDER BY o.day, o.hm`;
   const { results } = await S.prepare(sql).all();
   const cols = results.length ? Object.keys(results[0]) : [];
@@ -580,7 +602,7 @@ async function archive(env) {
   const cut = now() - LIMITS.keepSecs;
   for (let round = 0; round < 40; round++) {
     const { results } = await env.DB.prepare(
-      'SELECT uid, no, created_at, status, items, total_cents, lang, service, confirmed_at, done_at FROM orders WHERE created_at < ? ORDER BY id LIMIT 40',
+      'SELECT uid, no, created_at, status, items, total_cents, lang, service, src, confirmed_at, done_at FROM orders WHERE created_at < ? ORDER BY id LIMIT 40',
     ).bind(cut).all();
     if (!results.length) break;
     const stmts = [];
@@ -589,9 +611,9 @@ async function archive(env) {
       let items = [];
       try { items = JSON.parse(r.items); } catch { /* bỏ qua */ }
       const status = r.status === 'new' ? 'expired' : r.status;
-      stmts.push(S.prepare(`INSERT OR IGNORE INTO orders_archive(uid, day, hm, weekday, no, status, service, n_items, total_cents, lang, confirm_secs, done_secs)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
-        r.uid, p.day, p.hm, p.dow, r.no, status, r.service || null, items.reduce((a, x) => a + (x.qty || 0), 0), r.total_cents, r.lang,
+      stmts.push(S.prepare(`INSERT OR IGNORE INTO orders_archive(uid, day, hm, weekday, no, status, service, src, n_items, total_cents, lang, confirm_secs, done_secs)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+        r.uid, p.day, p.hm, p.dow, r.no, status, r.service || null, r.src || null, items.reduce((a, x) => a + (x.qty || 0), 0), r.total_cents, r.lang,
         r.confirmed_at ? r.confirmed_at - r.created_at : null, r.done_at ? r.done_at - r.created_at : null));
       items.forEach((x, k) => stmts.push(S.prepare(
         'INSERT OR IGNORE INTO lines_archive(uid, line, item_id, qty, unit_cents) VALUES (?, ?, ?, ?, ?)',

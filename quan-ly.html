@@ -30,6 +30,7 @@
 <button type="button" data-mode="auto">Theo giờ mở cửa</button><button type="button" data-mode="open">Luôn mở</button><button type="button" data-mode="paused">Tạm dừng</button>
 </div>
 <div class="tools">
+<button type="button" id="open-pos" class="b b-green">+ Nhập đơn tại quầy</button>
 <button type="button" id="sound" class="b b-out">Bật chuông</button>
 <button type="button" id="open-settings" class="b b-out">Cài đặt</button>
 </div>
@@ -66,7 +67,30 @@
 </section>
 </dialog>
 
+<dialog id="pos" class="pos">
+<div class="pos-head"><b>Nhập đơn tại quầy</b><input id="pos-q" type="search" placeholder="Tìm món (tiếng Việt hoặc tiếng Pháp)…" autocomplete="off"><button type="button" class="x" data-close aria-label="Đóng">×</button></div>
+<div class="pos-body">
+<section class="pos-menu"><nav id="pos-cats" class="pos-cats" aria-label="Danh mục"></nav><div id="pos-grid" class="pos-grid"></div></section>
+<aside class="pos-cart" id="pos-cart">
+<h3>Đơn đang nhập</h3>
+<ul id="pos-lines" class="c-items pos-lines"></ul>
+<p id="pos-info" class="pos-info" hidden></p>
+<div class="pos-svc" role="radiogroup" aria-label="Ăn tại chỗ hay mang đi"><button type="button" role="radio" data-psvc="place">Ăn tại chỗ<small>Sur place</small></button><button type="button" role="radio" data-psvc="emporter">Mang đi<small>À emporter</small></button></div>
+<input id="pos-name" class="pos-in" type="text" maxlength="30" placeholder="Tên hoặc số bàn (không bắt buộc)" autocomplete="off">
+<textarea id="pos-note" class="pos-in" maxlength="140" rows="2" placeholder="Ghi chú (không bắt buộc)"></textarea>
+<div class="pos-total"><span>Tổng</span><b id="pos-total">0,00 €</b></div>
+<p id="pos-msg" class="msg" role="alert"></p>
+<div class="row pos-actions"><button type="button" id="pos-clear" class="b b-out">Xóa hết</button><button type="button" id="pos-send" class="b b-green">Tạo đơn</button></div>
+</aside>
+</div>
+<button type="button" id="pos-jump" class="b b-green pos-jump" hidden></button>
+</dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+
 <div id="print" aria-hidden="true"></div>
+<script src="assets/menu.js"></script>
+<script src="assets/formules.js"></script>
+<script src="assets/formule-calc.js"></script>
 <script src="assets/qrcode.js"></script>
 <script src="assets/quan-ly.js"></script>
 </body>
