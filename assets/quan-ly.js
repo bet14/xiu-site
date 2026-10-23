@@ -222,7 +222,6 @@ $('#pos-send').addEventListener('click',function(){
  if(!items.length){$('#pos-msg').textContent='Chưa có món nào.';return;}
  if(!P.svc){$('#pos-msg').textContent='Chọn « Ăn tại chỗ » hoặc « Mang đi ».';$('.pos-svc').classList.add('need');return;}
  if(!$('#pos-name').value.trim()){$('#pos-msg').textContent='Nhập tên hoặc số bàn.';$('#pos-name').classList.add('need');$('#pos-name').focus();return;}
- if(!$('#pos-note').value.trim()){$('#pos-msg').textContent='Nhập ghi chú (ghi « không » nếu không có gì).';$('#pos-note').classList.add('need');$('#pos-note').focus();return;}
  var b=this;b.disabled=true;$('#pos-msg').textContent='';
  api('POST','/orders',{items:items,decline:P.decl,service:P.svc,name:$('#pos-name').value,note:$('#pos-note').value,lang:'vi'}).then(function(r){
   b.disabled=false;
