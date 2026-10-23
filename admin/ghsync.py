@@ -15,7 +15,7 @@ CONFIG = os.path.join(os.path.expanduser("~"), ".xiu-site-admin.json")
 DEFAULT_REPO = "bet14/xiu-site"
 DEFAULT_BRANCH = "main"
 MAX_FILE = 25 * 1024 * 1024
-SKIP_DIRS = {".git", "__pycache__", "node_modules", ".vscode", ".idea"}
+SKIP_DIRS = {".git", "__pycache__", "node_modules", ".vscode", ".idea", "dist"}
 SKIP_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}
 KEEP_DOT = {".nojekyll", ".gitignore", ".gitattributes"}
 

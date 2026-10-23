@@ -1,0 +1,24 @@
+// Cấu hình Cloudflare Worker cho trang Xíu (trang web + đặt món).
+// Bí mật (APP_SECRET, STAFF_PASSWORD, …) KHÔNG ghi ở đây: đặt trong
+// Cloudflare → Workers & Pages → xiu-site → Settings → Variables and Secrets.
+{
+  "name": "xiu-site",
+  "main": "worker/index.js",
+  "compatibility_date": "2025-10-01",
+  "build": { "command": "node worker/build.mjs" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "none"
+  },
+  // Hai cơ sở dữ liệu D1: đơn trong ngày, và kho thống kê ẩn danh.
+  // Lần triển khai đầu, Cloudflare tự tạo nếu chưa có.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "xiu-orders" },
+    { "binding": "STATS", "database_name": "xiu-stats" }
+  ],
+  // 02:15 UTC mỗi ngày (≈ 3h–4h sáng giờ Paris): lưu trữ và xóa đơn cũ hơn 24 giờ
+  "triggers": { "crons": ["15 2 * * *"] },
+  "keep_vars": true,
+  "observability": { "enabled": true }
+}
