@@ -3,7 +3,7 @@
 var LANGS=['fr','en','de','es','vi','zh','ko','ja'];
 var LANG_NAME={fr:'Français',en:'English',de:'Deutsch',es:'Español',vi:'Tiếng Việt',zh:'中文',ko:'한국어',ja:'日本語'};
 var LANG_SHORT={fr:'FR',en:'EN',de:'DE',es:'ES',vi:'VI',zh:'中文',ko:'한국어',ja:'日本語'};
-var lang='fr',vegOnly=false,page=document.body.getAttribute('data-page')||'';
+var lang='fr',filt='all',page=document.body.getAttribute('data-page')||'';
 try{var q=new URLSearchParams(location.search).get('lang'),s=localStorage.getItem('xiu-lang');lang=LANGS.indexOf(q)>=0?q:(LANGS.indexOf(s)>=0?s:lang);}catch(e){}
 
 // Liens de l'ancienne page unique (www.xiu-paris.fr/#menu …) → nouvelles pages
@@ -105,12 +105,21 @@ function renderWeek(){
 var FLAT=[];
 function badgeHtml(it){return it.badge?'<span class="mbadge '+esc(it.badge)+'">'+esc(T('badge_'+it.badge)||it.badge)+'</span>':'';}
 function viSub(it){return lang==='vi'||!it.vi?'':(it.vi[0]||'');}
+// hai danh mục ảo cuối thực đơn: món chay và món halal (gom món từ mọi danh mục)
+var VCAT=[
+ {id:'veggie',key:'veg',icon:'🥬',title:{fr:'Veggie',en:'Veggie',de:'Veggie',es:'Veggie',vi:'Món chay',zh:'素食',ko:'채식',ja:'ベジ'}},
+ {id:'halal',key:'halal',icon:'🍗',title:{fr:'Halal',en:'Halal',de:'Halal',es:'Halal',vi:'Món halal',zh:'清真',ko:'할랄',ja:'ハラル'}}
+];
 function catsToShow(){
- var cats=(window.MENU||[]).filter(function(c){return !c.hide;}),vegs=[];
- cats.forEach(function(c){(c.items||[]).forEach(function(it){if(it.veg&&!it.hide&&avail(it))vegs.push(it);});});
- var out=cats.slice();
- if(vegs.length)out.push({id:'veggie',icon:'🥬',title:{fr:'Veggie',en:'Veggie',de:'Veggie',es:'Veggie',vi:'Món chay',zh:'素食',ko:'채식'},items:vegs});
- return vegOnly?out.filter(function(c){return c.id==='veggie';}):out;
+ var cats=(window.MENU||[]).filter(function(c){return !c.hide;}),out=cats.slice();
+ VCAT.forEach(function(v){
+  var list=[];
+  cats.forEach(function(c){(c.items||[]).forEach(function(it){if(it[v.key]&&!it.hide&&avail(it))list.push(it);});});
+  if(list.length)out.push({id:v.id,icon:v.icon,title:v.title,items:list});
+ });
+ if(filt==='all')return out;
+ var want=filt==='veg'?'veggie':'halal';
+ return out.filter(function(c){return c.id===want;});
 }
 function renderMenu(){
  var main=$('#cats'),nav=$('#catnav'),sheet=$('#cat-sheet-list');if(!main)return;
@@ -214,7 +223,7 @@ function apply(){
  paintStatus();paintHours();renderWeek();renderMenu();comtam();setHH();
 }
 function setLang(l){lang=l;try{localStorage.setItem('xiu-lang',lang);}catch(e){}apply();}
-$$('.filters button').forEach(function(b){b.addEventListener('click',function(){vegOnly=b.dataset.f==='veg';$$('.filters button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});renderMenu();var c=$('#carte');if(c)c.scrollIntoView({block:'start'});});});
+$$('.filters button').forEach(function(b){b.addEventListener('click',function(){filt=b.dataset.f||'all';$$('.filters button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});renderMenu();var c=$('#carte');if(c)c.scrollIntoView({block:'start'});});});
 
 socials();socialIcons();wireDialogs();apply();
 window.addEventListener('resize',setHH);window.addEventListener('load',function(){setHH();

@@ -89,7 +89,7 @@ body.has-obar .mbar{display:none}
 .obar{left:0;right:0;bottom:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.06);align-items:stretch}
 .ob-cart{width:100%;min-height:52px;box-shadow:none;justify-content:space-between}
 .ob-last{justify-content:center;box-shadow:none}
-.ocart,.odone{width:100%;max-width:100%;max-height:92vh}
+.ocart,.odone,.ocombo{width:100%;max-width:100%;max-height:88vh;max-height:88dvh;padding-bottom:env(safe-area-inset-bottom)}
 .md-order{position:sticky;bottom:0;background:#fff;padding-bottom:4px}
 .oq{right:-2px}
 .dwrap.has-img .dadd{right:6px;bottom:22px;width:42px;height:42px}
@@ -105,6 +105,16 @@ body.has-obar .mbar{display:none}
 .seg2 button{font:inherit;font-weight:800;font-size:16px;min-height:50px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
 .seg2 button[aria-checked=true]{background:var(--green);border-color:var(--green);color:#fff}
 .od-svc{display:inline-block;margin-top:10px;padding:6px 14px;border-radius:999px;background:var(--ink);color:#fff;font-weight:800}
+
+/* ---------- khách đang ở trong tiệm: bỏ nút gọi điện / chỉ đường ---------- */
+body.ordering .seg,body.ordering .store-soc,body.ordering .mbar{display:none!important}
+
+/* ---------- tấm trượt: đầu bảng luôn thấy, chỉ phần ruột cuộn ---------- */
+.ocart,.odone,.ocombo{overflow:hidden}
+.ocart[open],.odone[open],.ocombo[open]{display:flex;flex-direction:column}
+.ocart .sheet-head,.odone .sheet-head,.ocombo .sheet-head{flex:0 0 auto}
+.oc-body,.od-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.oc-more{width:100%;margin-top:10px}
 
 /* ---------- nút quay lại trong tấm trượt ---------- */
 .sheet-back{border:0;padding:0;width:40px;height:40px;border-radius:50%;background:#F3F0EC;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}

@@ -41,7 +41,7 @@ HEAD_MENU = """// ==============================================================
 //   badge : "signature", "top1", "top2", "top3", "populaire", "nouveau" hoặc ""
 //   icon  : biểu tượng trước tên món
 //   hide  : true để tạm ẩn món (hết hàng) mà không xoá
-//   fr/en/de/es/vi/zh/ko : [tên món, mô tả]  (de, es để trống thì web dùng tạm tiếng Anh)
+//   fr/en/de/es/vi/zh/ko/ja : [tên món, mô tả]  (de, es để trống thì web dùng tạm tiếng Anh)
 // =====================================================================
 """
 HEAD_SEMAINE = """// =====================================================================
@@ -107,7 +107,7 @@ def clean_menu(menu):
     out, ids = [], set()
     for c in menu:
         cid = s(c.get("id"), 60)
-        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", cid) or cid in ids or cid == "veggie":
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", cid) or cid in ids or cid in ("veggie", "halal"):
             raise ValueError("Mã danh mục không hợp lệ hoặc bị trùng: %r" % cid)
         ids.add(cid)
         title = c.get("title") if isinstance(c.get("title"), dict) else {}
