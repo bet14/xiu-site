@@ -69,6 +69,7 @@
     if (auto && auto.id) {
       var autoGroup = groupOf(cfg, auto.id, auto.cat);
       (cfg.formules || []).forEach(function (f) {
+        if (f.auto === false) return;
         var left = slots.filter(function (s) { return !s.taken && s.fid === f.id; }).length;
         if (!left) return;
         var d = Math.min(left, Math.max(0, decline[f.id] | 0)), q = left - d;

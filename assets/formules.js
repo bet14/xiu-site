@@ -7,6 +7,7 @@
 //            cats = mã danh mục trong menu.js, items = mã món thêm vào nhóm, exclude = mã món loại ra
 // drinks   : các món nước ĐƯỢC giảm theo combo (bia không có trong danh sách nên không giảm)
 // auto_drink : món nước tự thêm khi khách có combo mà chưa chọn nước
+//            (chỉ áp cho combo có auto không phải false; combo bánh mì: auto false, khách tự gọi nước 1 €)
 // formules : starter + main → nước giá drink_cents (0 = tặng, 100 = 1 €).
 //            Áp theo thứ tự: combo món chính (tặng nước) trước, combo bánh mì (nước 1 €) sau.
 // =====================================================================
@@ -22,6 +23,6 @@ window.FORMULES = {
   "auto_drink": "canette-33-cl",
   "formules": [
     {"id": "formule-plat", "starter": "entree", "main": "plat", "drink_cents": 0},
-    {"id": "formule-banh-mi", "starter": "entree", "main": "banhmi", "drink_cents": 100}
+    {"id": "formule-banh-mi", "starter": "entree", "main": "banhmi", "drink_cents": 100, "auto": false}
   ]
 };
