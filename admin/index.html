@@ -13,6 +13,8 @@
 <div class="brand"><img src="../assets/logo-xiu-blanc.png" alt="" width="62" height="32"><span>Quản lý</span></div>
 <nav class="views" role="tablist">
 <button role="tab" data-view="menu" aria-selected="true">Thực đơn</button>
+<button role="tab" data-view="hours" aria-selected="false">Giờ mở cửa</button>
+<button role="tab" data-view="texts" aria-selected="false">Nội dung trang</button>
 <button role="tab" data-view="links" aria-selected="false">Mạng xã hội</button>
 <button role="tab" data-view="github" aria-selected="false">GitHub</button>
 </nav>
@@ -44,6 +46,45 @@ Trang này chỉ chạy khi máy chủ quản trị đang bật. Nhấp đúp <b
 </section>
 
 <aside class="col editor" id="item-edit"><p class="empty">Chọn một món để sửa.</p></aside>
+</section>
+
+<!-- ===================== GIỜ MỞ CỬA ===================== -->
+<section class="view" id="view-hours" hidden>
+<div class="narrow">
+<div class="card">
+<h2>Giờ mở cửa</h2>
+<p class="hint">Một nơi duy nhất, dùng cho cả ba chỗ: dòng « Đang mở / Đã đóng » trên trang web, bảng giờ ở trang Infos và dòng giờ ở chân trang, và việc nhận đơn đặt món (chế độ « Theo giờ mở cửa » ở trang Quản lý đơn). Bỏ chọn « Mở cửa » là ngày đó nghỉ. Một ngày có thể có nhiều khung giờ, ví dụ trưa và tối.</p>
+<div id="h-days"></div>
+</div>
+<div class="card">
+<h2>Nhận đơn đặt món</h2>
+<p class="hint">Chỉ ảnh hưởng đến đơn khách gửi từ điện thoại, không ảnh hưởng giờ hiển thị trên trang web.</p>
+<div class="g2">
+<label class="f"><span>Mở nhận đơn sớm hơn giờ mở cửa (phút)</span><input type="number" id="h-early" min="0" max="120" step="5"></label>
+<label class="f"><span>Ngừng nhận đơn trước giờ đóng (phút)</span><input type="number" id="h-before" min="0" max="120" step="5"></label>
+</div>
+</div>
+<div class="card">
+<h2>Xem thử</h2>
+<p class="hint">Đúng như khách sẽ thấy ở trang Infos và chân trang (tiếng Pháp).</p>
+<div id="h-preview" class="code"></div>
+</div>
+</div>
+</section>
+
+<!-- ===================== NỘI DUNG TRANG ===================== -->
+<section class="view" id="view-texts" hidden>
+<div class="narrow">
+<div class="card">
+<h2>Nội dung trang</h2>
+<p class="hint">Sửa phần chữ của các trang Traiteur, Infos và « Notre histoire ». Để trống một ô là trang web dùng lại bản gốc (hiện mờ trong ô). Mỗi lần chỉ sửa một ngôn ngữ; chọn ngôn ngữ ở ô bên phải.</p>
+<div class="g2">
+<label class="f"><span>Trang</span><select id="tx-page"><option value="traiteur">Traiteur</option><option value="infos">Infos</option><option value="histoire">Notre histoire</option></select></label>
+<label class="f"><span>Ngôn ngữ</span><select id="tx-lang"></select></label>
+</div>
+</div>
+<div class="card" id="tx-fields"></div>
+</div>
 </section>
 
 <!-- ===================== MẠNG XÃ HỘI ===================== -->

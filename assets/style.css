@@ -29,9 +29,11 @@ header.top{position:sticky;top:0;z-index:40;background:#fff;box-shadow:0 1px 0 v
 .logo{flex:0 0 auto}
 .logo img{height:46px;width:auto}
 .tabs{display:flex;gap:4px;margin-right:auto}
-.tabs a{color:var(--ink);text-decoration:none;font-weight:800;padding:8px 14px;border-radius:999px;font-size:16px;white-space:nowrap}
-.tabs a:hover{background:var(--yl)}
-.tabs a[aria-current=page]{background:var(--ink);color:#fff}
+.tabs a{font-family:var(--display);font-weight:800;color:var(--green);text-decoration:none;padding:7px 15px;border:2px solid transparent;border-radius:999px;font-size:17.5px;letter-spacing:.2px;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.tabs a:hover{background:var(--yl);color:#B35600}
+.tabs a:active{border-color:var(--orange);background:var(--yl);color:#B35600}
+.tabs a[aria-current=page]{background:var(--yl);color:#B35600;border-color:var(--orange)}
+.tabs a:focus-visible{border-color:var(--orange);outline:none}
 .hsoc{display:flex;gap:6px}
 .hsoc a{font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;padding:6px 12px;border:1.5px solid var(--line);border-radius:999px}
 .hsoc a:hover{border-color:var(--orange);color:var(--orange)}
@@ -130,10 +132,11 @@ header.top{position:sticky;top:0;z-index:40;background:#fff;box-shadow:0 1px 0 v
 .carte{padding-top:18px}
 .catbar{position:sticky;top:var(--hh);z-index:30;background:#fff;border-bottom:1px solid var(--line)}
 .catbar-in{display:flex;align-items:center;gap:8px;height:var(--cbh)}
-.catnav{flex:1;min-width:0;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;height:100%;align-items:stretch;scroll-behavior:smooth}
+.catnav{flex:1;min-width:0;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;height:100%;align-items:center;scroll-behavior:smooth;padding:0 2px}
 .catnav::-webkit-scrollbar{display:none}
-.catnav a{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:0 12px;white-space:nowrap;text-decoration:none;color:var(--ink);font-weight:700;font-size:14.5px;border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.2px}
-.catnav a.on{border-bottom-color:var(--ink)}
+.catnav a{flex:0 0 auto;display:flex;align-items:center;gap:6px;height:36px;padding:0 15px;white-space:nowrap;text-decoration:none;font-family:var(--display);font-weight:800;font-size:15.5px;letter-spacing:.2px;color:#B35600;background:var(--yl);border-radius:999px;transition:background .15s,color .15s,box-shadow .15s}
+.catnav a:hover{background:#FFE7A0;color:#8A5A00}
+.catnav a.on{background:var(--orange);color:#fff;box-shadow:0 2px 9px rgba(255,122,0,.34)}
 .catlist{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:#F3F0EC;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .catlist svg{width:20px;height:20px}
 .menu-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 0 4px}
@@ -245,7 +248,7 @@ section{padding:36px 0}
 .logo img{height:36px}
 .tabs{gap:0;margin:0;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;justify-content:safe center}
 .tabs::-webkit-scrollbar{display:none}
-.tabs a{font-size:14px;padding:7px 7px}
+.tabs a{font-size:15.5px;padding:6px 10px;border-width:1.5px}
 .lang-sel{padding:5px 4px;min-height:34px;font-size:13px;width:62px}
 .logo img{height:32px}
 .langs{display:none}
@@ -267,7 +270,8 @@ section{padding:36px 0}
 .notice img{width:92px;height:92px;flex-basis:92px}
 .ncall .num{display:none}
 .catbar-in{padding:0 0 0 4px;gap:4px}
-.catnav a{font-size:13.5px;padding:0 10px}
+.catnav a{font-size:14px;padding:0 12px;height:33px}
+.catnav{gap:6px}
 .mcat h2{font-size:19px;padding:8px 14px}
 .dish{padding:14px 0;gap:12px}
 .dn{font-size:14.5px}
@@ -293,7 +297,7 @@ section{padding:36px 0}
 .mbar .btn{min-height:46px;font-size:15px;border-radius:12px}
 }
 @media(max-width:380px){
-.tabs a{padding:6px 5px;font-size:13px}
+.tabs a{padding:5px 8px;font-size:14.5px}
 .logo img{height:32px}
 .dimg{flex-basis:92px;width:92px;height:92px}
 }

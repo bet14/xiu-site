@@ -7,7 +7,9 @@ try{var q=new URLSearchParams(location.search).get('lang'),s=localStorage.getIte
 // Liens de l'ancienne page unique (www.xiu-paris.fr/#menu …) → nouvelles pages
 if(page==='home'){var old={'#menu':'menu.html','#semaine':'menu.html','#traiteur':'traiteur.html','#infos':'infos.html'}[location.hash];if(old){location.replace(old);return;}}
 
-function T(k){var d=I18N[lang]||I18N.fr;return d[k]!=null?d[k]:I18N.fr[k];}
+// chữ của trang: bản sửa trong assets/textes.js (trang quản trị) được ưu tiên,
+// để trống thì dùng bản gốc trong assets/i18n.js
+function T(k){var o=window.TEXTES&&window.TEXTES[k];if(o&&o[lang])return o[lang];var d=I18N[lang]||I18N.fr;return d[k]!=null?d[k]:I18N.fr[k];}
 // món chưa dịch: de/es lấy tạm tiếng Anh, các ngôn ngữ khác lấy tiếng Pháp
 function fb(){return lang==='de'||lang==='es'?['en','fr']:['fr'];}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -33,18 +35,52 @@ function socials(){var S=window.SITE||{};
  $$('.js-fb').forEach(function(a){if(S.facebook){a.href=S.facebook;a.hidden=false;}else a.hidden=true;});}
 
 // ---------- horaires / statut ----------
-function status(){
- var slots={0:[],1:[[660,900],[1080,1260]],2:[[660,900],[1080,1260]],3:[[660,900],[1080,1260]],4:[[660,900],[1080,1260]],5:[[660,1260]],6:[[660,1260]]};
+// Giờ mở cửa lấy từ assets/horaires.js (sửa trong trang quản trị) — dùng chung
+// với máy chủ đặt món, nên trạng thái, bảng giờ, chân trang và việc nhận đơn luôn khớp.
+function hm(v){var m=/^(\d{1,2}):(\d{2})$/.exec(String(v==null?'':v));return m?+m[1]*60+ +m[2]:-1;}
+function slotsAll(){
+ var d=(window.HORAIRES&&window.HORAIRES.days)||{},o={};
+ for(var i=0;i<7;i++)o[i]=(d[i]||d[String(i)]||[]).map(function(p){return [hm(p[0]),hm(p[1])];})
+  .filter(function(p){return p[0]>=0&&p[1]>p[0];}).sort(function(a,b){return a[0]-b[0];});
+ return o;
+}
+function fTime(x){var hh=Math.floor(x/60),mm=x%60;return lang==='fr'||lang==='vi'?hh+'h'+(mm?('0'+mm).slice(-2):''):hh+':'+('0'+mm).slice(-2);}
+function fSlots(t){return t.map(function(p){return fTime(p[0])+' – '+fTime(p[1]);}).join(' · ');}
+function parisNow(){
  var map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6},day=1,m=720;
  try{var g={};new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(function(p){g[p.type]=p.value;});day=map[g.weekday];m=+g.hour*60+ +g.minute;}catch(e){}
- function f(x){var hh=Math.floor(x/60),mm=x%60;return lang==='fr'||lang==='vi'?hh+'h'+(mm?('0'+mm).slice(-2):''):hh+':'+('0'+mm).slice(-2);}
- var t=slots[day],i;
- for(i=0;i<t.length;i++)if(m>=t[i][0]&&m<t[i][1])return[true,T('st_open')+f(t[i][1])];
- for(i=0;i<t.length;i++)if(t[i][0]>m)return[false,T('st_closed')+f(t[i][0])];
- for(var k=1;k<=7;k++){var d=(day+k)%7;if(slots[d].length)return[false,T('closed')+' · '+(k===1?T('st_tomorrow'):T('days')[d])+' '+f(slots[d][0][0])];}
+ return [day,m];
+}
+function status(){
+ var slots=slotsAll(),p=parisNow(),day=p[0],m=p[1],t=slots[day]||[],i;
+ for(i=0;i<t.length;i++)if(m>=t[i][0]&&m<t[i][1])return[true,T('st_open')+fTime(t[i][1])];
+ for(i=0;i<t.length;i++)if(t[i][0]>m)return[false,T('st_closed')+fTime(t[i][0])];
+ for(var k=1;k<=7;k++){var d=(day+k)%7;if((slots[d]||[]).length)return[false,T('closed')+' · '+(k===1?T('st_tomorrow'):T('days')[d])+' '+fTime(slots[d][0][0])];}
  return[false,T('closed')];
 }
 function paintStatus(){var st=status();$$('.js-status').forEach(function(el){el.classList.remove('open','closed');el.classList.add(st[0]?'open':'closed');$('.st',el).textContent=st[1];});}
+// bảng giờ (trang Infos) + dòng giờ ở chân trang: gộp các ngày liền nhau có cùng khung giờ
+function dayName(i){var n=(T('days')||[])[i]||'';return n.charAt(0).toUpperCase()+n.slice(1);}
+function hourGroups(){
+ var slots=slotsAll(),order=[1,2,3,4,5,6,0],out=[],sig=function(i){return JSON.stringify(slots[i]||[]);};
+ order.forEach(function(d){
+  var last=out[out.length-1];
+  if(last&&last.sig===sig(d))last.days.push(d);
+  else out.push({sig:sig(d),days:[d],slots:slots[d]||[]});
+ });
+ return out;
+}
+function groupLabel(g){var a=g.days[0],b=g.days[g.days.length-1];return g.days.length>1?dayName(a)+' – '+((T('days')||[])[b]||''):dayName(a);}
+function paintHours(){
+ var gs=hourGroups();
+ var box=$('.hours');
+ if(box)box.innerHTML=gs.map(function(g){
+  return '<div class="day">'+esc(groupLabel(g))+'</div><div'+(g.slots.length?'':' class="closed-t"')+'>'
+   +esc(g.slots.length?fSlots(g.slots):T('closed'))+'</div>';
+ }).join('');
+ var line=gs.map(function(g){return groupLabel(g)+' '+(g.slots.length?fSlots(g.slots):T('closed'));}).join(' · ');
+ $$('[data-i="foot_h"]').forEach(function(el){el.textContent=line;});
+}
 
 // ---------- Cette semaine ----------
 function comtam(){
@@ -153,7 +189,7 @@ function apply(){
  $$('.langs button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.l===lang);});
  $$('.lang-sel').forEach(function(s){s.value=lang;});
  $$('.md-close').forEach(function(b){b.setAttribute('aria-label',T('close'));});
- paintStatus();renderWeek();renderMenu();comtam();setHH();
+ paintStatus();paintHours();renderWeek();renderMenu();comtam();setHH();
 }
 function setLang(l){lang=l;try{localStorage.setItem('xiu-lang',lang);}catch(e){}apply();}
 $$('.langs button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.l);});});

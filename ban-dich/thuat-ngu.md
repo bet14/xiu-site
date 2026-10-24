@@ -16,5 +16,14 @@ Tiếng Pháp là bản gốc. Các ngôn ngữ khác dịch theo bảng này đ
 | cacahuètes | peanuts | Erdnüsse | cacahuetes | đậu phộng | 花生 | 땅콩 |
 | porc rôti | roast pork | Schweinebraten | cerdo asado | heo quay / thịt quay | 烤猪肉 / 脆皮烧肉 | 로스트 포크 |
 | saucisse de porc (nem nướng) | pork sausage | Schweinswurst | salchicha de cerdo | nem nướng | 猪肉肠 | 돼지고기 소시지 |
+| beurre à l'œuf (bơ trứng) | egg butter | Eierbutter | mantequilla de huevo | bơ trứng | 蛋黄油 | 달걀 버터 |
+| fait maison | homemade | hausgemacht | casero | nhà làm / tự làm | 自制 / 自家手作 | 수제 |
+| nouilles udon | udon noodles | Udon-Nudeln | fideos udon | mì udon | 乌冬面 | 우동면 |
+| ciboule | spring onion | Frühlingszwiebel | cebolleta | hành lá | 葱 | 대파 |
+| oignon | onion | Zwiebel | cebolla | hành tây | 洋葱 | 양파 |
+| légumes marinés | pickled vegetables | eingelegtes Gemüse | verduras encurtidas | đồ chua | 腌菜 | 채소 절임 |
+| brocoli | broccoli | Brokkoli | brócoli | bông cải xanh | 西兰花 | 브로콜리 |
+
+Quy ước riêng: bơ trứng dịch là “beurre à l'œuf”, tuyệt đối không gọi là mayonnaise. Nem nướng dịch là “saucisse de porc” (grillée). “Tự làm / nhà làm” dịch là “fait maison” trong phần mô tả; trong tên món vẫn dùng dạng ngắn “maison”.
 
 Nguyên liệu gây dị ứng (đậu phộng, tôm, trứng, nước dùng bò trong món chay) phải có mặt ở mọi ngôn ngữ, không được lược bớt.

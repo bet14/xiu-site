@@ -55,6 +55,35 @@ HEAD_SITE = """// ==============================================================
 // Để "" nếu chưa có: nút tương ứng sẽ tự ẩn.
 // =====================================================================
 """
+HEAD_HOURS = """// =====================================================================
+// GIỜ MỞ CỬA — nguồn duy nhất cho: trang web (trạng thái Đang mở/Đã đóng,
+// bảng giờ ở trang Infos, dòng giờ ở chân trang) và máy chủ đặt món
+// (chế độ « Theo giờ mở cửa » ở trang /quan-ly).
+// Sửa bằng trang quản trị (tab « Giờ mở cửa ») hoặc bằng Notepad.
+//   days   : 0 = Chủ nhật … 6 = Thứ Bảy; mỗi khung giờ ["mở", "đóng"] dạng "HH:MM"
+//            danh sách rỗng = ngày đó nghỉ
+//   early  : nhận đơn sớm hơn giờ mở cửa bao nhiêu phút
+//   before : ngừng nhận đơn trước giờ đóng bao nhiêu phút
+// =====================================================================
+"""
+HEAD_TEXTES = """// =====================================================================
+// NỘI DUNG CÁC TRANG — phần chữ sửa được từ trang quản trị
+// (tab « Nội dung trang »: Traiteur, Infos, Notre histoire).
+// Mỗi mã chữ: { "fr": "…", "en": "…", … }. Để trống một ngôn ngữ thì
+// trang web dùng bản gốc trong assets/i18n.js.
+// =====================================================================
+"""
+
+# Các mã chữ được phép sửa từ trang quản trị (khớp TXPAGES trong admin/admin.js).
+TEXT_KEYS = [
+    "tr_bubble", "tr_t2", "tr_p", "tr_quote",
+    "occ1", "occ1d", "occ2", "occ2d", "occ3", "occ3d", "occ4", "occ4d",
+    "tile_menu", "tile_menu_d",
+    "infos_t", "hours_t", "k_addr", "v_addr", "k_metro", "v_metro",
+    "k_order", "v_order", "k_onsite", "v_onsite", "k_pay", "v_pay", "dir_t", "dir_p",
+    "story_k", "story_t", "story_p1", "story_p2", "story_p3",
+    "cta_carte", "tile_story", "tile_story_d",
+]
 
 
 def j(v):
@@ -151,6 +180,64 @@ def clean_site(x):
     return out
 
 
+def clean_hours(h):
+    """Giờ mở cửa: 7 ngày, mỗi ngày tối đa 3 khung ["HH:MM", "HH:MM"], giờ đóng phải sau giờ mở."""
+    h = h if isinstance(h, dict) else {}
+    src = h.get("days") if isinstance(h.get("days"), dict) else {}
+    days = {}
+    for i in range(7):
+        raw = src.get(str(i)) or src.get(i) or []
+        slots = []
+        for pair in raw if isinstance(raw, list) else []:
+            if not isinstance(pair, list) or len(pair) != 2:
+                continue
+            a, b = (hm(pair[0]), hm(pair[1]))
+            if a is None or b is None:
+                raise ValueError("Giờ phải ở dạng HH:MM (ví dụ 11:00)")
+            if mins(b) <= mins(a):
+                raise ValueError("Giờ đóng phải sau giờ mở (%s → %s)" % (a, b))
+            slots.append([a, b])
+        slots.sort(key=lambda p: mins(p[0]))
+        for k in range(1, len(slots)):
+            if mins(slots[k][0]) < mins(slots[k - 1][1]):
+                raise ValueError("Hai khung giờ trong cùng một ngày bị chồng lên nhau")
+        days[str(i)] = slots[:3]
+    return {"days": days, "early": num120(h.get("early"), 15), "before": num120(h.get("before"), 10)}
+
+
+def hm(v):
+    m = re.fullmatch(r"(\d{1,2}):(\d{2})", str(v or "").strip())
+    if not m or int(m.group(1)) > 23 or int(m.group(2)) > 59:
+        return None
+    return "%02d:%s" % (int(m.group(1)), m.group(2))
+
+
+def mins(v):
+    return int(v[:2]) * 60 + int(v[3:])
+
+
+def num120(v, default):
+    try:
+        n = int(round(float(v)))
+    except (TypeError, ValueError):
+        return default
+    return n if 0 <= n <= 120 else default
+
+
+def clean_textes(t):
+    """Chữ các trang: chỉ nhận mã chữ có trong TEXT_KEYS, bỏ ngôn ngữ để trống."""
+    t = t if isinstance(t, dict) else {}
+    out = {}
+    for k in TEXT_KEYS:
+        o = t.get(k)
+        if not isinstance(o, dict):
+            continue
+        v = {l: s(o.get(l), 2000).strip() for l in LANGS if s(o.get(l), 2000).strip()}
+        if v:
+            out[k] = v
+    return out
+
+
 def backup(name):
     src = os.path.join(ASSETS, name)
     if not os.path.exists(src):
@@ -237,6 +324,27 @@ class Handler(SimpleHTTPRequestHandler):
                     backup("site.js")
                     write_atomic(os.path.join(ASSETS, "site.js"), HEAD_SITE + "window.SITE = " + json.dumps(x, ensure_ascii=False, indent=2) + ";\n")
                     done.append("site")
+                if "hours" in data:
+                    hrs = clean_hours(data["hours"])
+                    backup("horaires.js")
+                    rows = ",\n".join(
+                        '      "%s": [%s]' % (k, ", ".join('["%s", "%s"]' % (a, b) for a, b in v))
+                        for k, v in sorted(hrs["days"].items()))
+                    body_js = ('{\n    "days": {\n%s\n    },\n    "early": %d,\n    "before": %d\n  }'
+                               % (rows, hrs["early"], hrs["before"]))
+                    write_atomic(os.path.join(ASSETS, "horaires.js"), HEAD_HOURS
+                                 + "(function (root, factory) {\n"
+                                 + "  if (typeof module === 'object' && module.exports) module.exports = factory();\n"
+                                 + "  else root.HORAIRES = factory();\n"
+                                 + "})(typeof self !== 'undefined' ? self : this, function () {\n"
+                                 + "  return " + body_js + ";\n});\n")
+                    done.append("hours")
+                if "textes" in data:
+                    tx = clean_textes(data["textes"])
+                    backup("textes.js")
+                    write_atomic(os.path.join(ASSETS, "textes.js"), HEAD_TEXTES
+                                 + "window.TEXTES = " + json.dumps(tx, ensure_ascii=False, indent=2) + ";\n")
+                    done.append("textes")
                 return self._json(200, {"ok": True, "saved": done, "time": time.strftime("%H:%M:%S")})
             if u.path == "/api/upload":
                 q = parse_qs(u.query)

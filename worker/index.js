@@ -16,6 +16,7 @@
 // =====================================================================
 
 import CALC from '../assets/formule-calc.js';
+import HORAIRES from '../assets/horaires.js';
 
 const LANGS = ['fr', 'en', 'de', 'es', 'vi', 'zh', 'ko'];
 const SERVICES = ['place', 'emporter']; // ăn tại chỗ / mang đi
@@ -37,11 +38,19 @@ const LIMITS = {
 };
 
 // Giờ nhận đơn (giờ Paris), phút trong ngày. 0 = Chủ nhật.
-const HOURS = {
-  0: [], 1: [[660, 900], [1080, 1260]], 2: [[660, 900], [1080, 1260]], 3: [[660, 900], [1080, 1260]],
-  4: [[660, 900], [1080, 1260]], 5: [[660, 1260]], 6: [[660, 1260]],
-};
-const OPEN_EARLY = 15, CLOSE_BEFORE = 10;
+// Lấy từ assets/horaires.js — cùng nguồn với trang web, nên sửa giờ ở trang
+// quản trị là cả trang web lẫn việc nhận đơn đều đổi theo.
+const hhmm = (v) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(v == null ? '' : v)); return m ? +m[1] * 60 + +m[2] : -1; };
+const HOURS = (() => {
+  const d = (HORAIRES && HORAIRES.days) || {}, o = {};
+  for (let i = 0; i < 7; i++) {
+    o[i] = (d[i] || d[String(i)] || []).map((p) => [hhmm(p[0]), hhmm(p[1])])
+      .filter((p) => p[0] >= 0 && p[1] > p[0]).sort((a, b) => a[0] - b[0]);
+  }
+  return o;
+})();
+const num = (v, def) => (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 120 ? v : def);
+const OPEN_EARLY = num(HORAIRES && HORAIRES.early, 15), CLOSE_BEFORE = num(HORAIRES && HORAIRES.before, 10);
 
 // ---------------------------------------------------------------- tiện ích
 const enc = new TextEncoder();

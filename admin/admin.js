@@ -3,8 +3,22 @@
 var LANGS=['fr','en','de','es','vi','zh','ko'];
 var LNAME={fr:'FR · Tiếng Pháp',en:'EN · Tiếng Anh',de:'DE · Tiếng Đức',es:'ES · Tiếng Tây Ban Nha',vi:'VI · Tiếng Việt',zh:'中文 · Tiếng Trung',ko:'한국어 · Tiếng Hàn'};
 var BADGES=[['','Không có'],['signature','Signature'],['top1','Le nº 1 le plus aimé'],['top2','Le nº 2 le plus aimé'],['top3','Le nº 3 le plus aimé'],['populaire','Populaire'],['nouveau','Nouveau']];
-var MENU=[],WEEK=null,SITE=null,IMAGES=[],online=false;
-var selCat=0,selItem=-1,saved={menu:'',semaine:'',site:''},GH={diff:null,st:null};
+var MENU=[],WEEK=null,SITE=null,HOURS=null,TEXTS=null,IMAGES=[],online=false;
+var selCat=0,selItem=-1,saved={menu:'',semaine:'',site:'',hours:'',textes:''},GH={diff:null,st:null};
+// các mã chữ sửa được, theo trang (phải khớp danh sách trong admin/server.py)
+var TXPAGES={
+ traiteur:[['tr_bubble','Câu bong bóng đầu trang'],['tr_t2','Dòng tiêu đề thứ hai'],['tr_p','Đoạn giới thiệu',1],['tr_quote','Chữ trên nút gọi điện'],
+  ['occ1','Ô 1 — tiêu đề'],['occ1d','Ô 1 — mô tả'],['occ2','Ô 2 — tiêu đề'],['occ2d','Ô 2 — mô tả'],
+  ['occ3','Ô 3 — tiêu đề'],['occ3d','Ô 3 — mô tả'],['occ4','Ô 4 — tiêu đề'],['occ4d','Ô 4 — mô tả'],
+  ['tile_menu','Ô cuối trang — « Notre carte »'],['tile_menu_d','Ô cuối trang — mô tả']],
+ infos:[['infos_t','Tiêu đề trang'],['hours_t','Tiêu đề mục giờ mở cửa'],
+  ['k_addr','Nhãn — Địa chỉ'],['v_addr','Địa chỉ'],['k_metro','Nhãn — Métro'],['v_metro','Métro'],
+  ['k_order','Nhãn — Đặt món'],['v_order','Đặt món'],['k_onsite','Nhãn — Tại chỗ'],['v_onsite','Tại chỗ'],
+  ['k_pay','Nhãn — Thanh toán'],['v_pay','Thanh toán'],['dir_t','Tiêu đề mục đường đi'],['dir_p','Đoạn chỉ đường',1]],
+ histoire:[['story_k','Nhãn nhỏ phía trên'],['story_t','Tiêu đề'],['story_p1','Đoạn 1',1],['story_p2','Đoạn 2',1],['story_p3','Đoạn 3',1],
+  ['cta_carte','Chữ trên nút dẫn tới thực đơn'],['tile_story','Ô ở trang chủ — tiêu đề'],['tile_story_d','Ô ở trang chủ — mô tả']]
+};
+function txKeys(){var o=[];for(var k in TXPAGES)TXPAGES[k].forEach(function(f){o.push(f[0]);});return o;}
 
 function $(s,r){return (r||document).querySelector(s);}
 function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
@@ -47,8 +61,9 @@ function normWeek(w){
  if(sp.img)o.special.img=sp.img;return o;
 }
 function strip(m){return JSON.stringify(m,function(k,v){return k==='_auto'?undefined:v;});}
-function snap(){saved.menu=strip(MENU);saved.semaine=JSON.stringify(WEEK);saved.site=JSON.stringify(SITE);dirty();}
-function changed(){var c={};if(strip(MENU)!==saved.menu)c.menu=1;if(JSON.stringify(WEEK)!==saved.semaine)c.semaine=1;if(JSON.stringify(SITE)!==saved.site)c.site=1;return c;}
+function snap(){saved.menu=strip(MENU);saved.semaine=JSON.stringify(WEEK);saved.site=JSON.stringify(SITE);saved.hours=JSON.stringify(HOURS);saved.textes=JSON.stringify(TEXTS);dirty();}
+function changed(){var c={};if(strip(MENU)!==saved.menu)c.menu=1;if(JSON.stringify(WEEK)!==saved.semaine)c.semaine=1;if(JSON.stringify(SITE)!==saved.site)c.site=1;
+ if(JSON.stringify(HOURS)!==saved.hours)c.hours=1;if(JSON.stringify(TEXTS)!==saved.textes)c.textes=1;return c;}
 function dirty(){var c=changed(),n=Object.keys(c).length,st=$('#state');
  $('#save').disabled=!n||!online;
  if(!online){st.textContent='Chỉ xem — máy chủ quản trị chưa bật';st.className='state dirty';return;}
@@ -235,10 +250,101 @@ function renderLinks(){$('#l-ig').value=SITE.instagram||'';$('#l-fb').value=SITE
 $('#l-ig').addEventListener('input',function(e){SITE.instagram=e.target.value.trim();dirty();});
 $('#l-fb').addEventListener('input',function(e){SITE.facebook=e.target.value.trim();dirty();});
 
+// ---------------- giờ mở cửa ----------------
+function normHours(h){
+ h=h||{};var d=h.days||{},o={days:{},early:0,before:0};
+ for(var i=0;i<7;i++){
+  o.days[i]=(d[i]||d[String(i)]||[]).map(function(p){return [hhmm(p&&p[0]),hhmm(p&&p[1])];})
+   .filter(function(p){return p[0]&&p[1];}).slice(0,3);
+ }
+ o.early=clampN(h.early,15);o.before=clampN(h.before,10);
+ return o;
+}
+function clampN(v,def){v=Math.round(+v);return isFinite(v)&&v>=0&&v<=120?v:def;}
+function hhmm(v){var m=/^(\d{1,2}):(\d{2})$/.exec(String(v==null?'':v).trim());if(!m)return '';var h=+m[1],mi=+m[2];
+ if(h>23||mi>59)return '';return ('0'+h).slice(-2)+':'+('0'+mi).slice(-2);}
+function toMin(v){var m=/^(\d{1,2}):(\d{2})$/.exec(v||'');return m?+m[1]*60+ +m[2]:-1;}
+function fFr(v){var m=toMin(v);return m<0?'':Math.floor(m/60)+'h'+(m%60?('0'+(m%60)).slice(-2):'');}
+function hoursGroupsFr(){
+ var D=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'],order=[1,2,3,4,5,6,0],out=[];
+ order.forEach(function(d){
+  var sl=(HOURS.days[d]||[]).filter(function(p){return toMin(p[0])>=0&&toMin(p[1])>toMin(p[0]);}),sig=JSON.stringify(sl),last=out[out.length-1];
+  if(last&&last.sig===sig)last.days.push(d);else out.push({sig:sig,days:[d],slots:sl});
+ });
+ return out.map(function(g){
+  var a=D[g.days[0]],b=D[g.days[g.days.length-1]],lab=(g.days.length>1?a+' – '+b:a);
+  lab=lab.charAt(0).toUpperCase()+lab.slice(1);
+  return lab+' : '+(g.slots.length?g.slots.map(function(p){return fFr(p[0])+' – '+fFr(p[1]);}).join(' · '):'fermé');
+ });
+}
+function renderHours(){
+ var box=$('#h-days');if(!box)return;
+ box.innerHTML=DAYS.map(function(d){
+  var i=d[0],sl=HOURS.days[i]||[],on=sl.length>0;
+  var name={1:'Thứ Hai',2:'Thứ Ba',3:'Thứ Tư',4:'Thứ Năm',5:'Thứ Sáu',6:'Thứ Bảy',0:'Chủ nhật'}[i];
+  return '<div class="hday'+(on?'':' off')+'" data-d="'+i+'"><b>'+name+'</b>'
+   +'<label class="on-l"><input type="checkbox" data-on'+(on?' checked':'')+'> Mở cửa</label>'
+   +'<div class="hslots">'+(on?sl.map(function(p,k){
+     return '<div class="hslot"><input type="time" data-t="0" data-k="'+k+'" value="'+esc(p[0])+'"><span>→</span>'
+      +'<input type="time" data-t="1" data-k="'+k+'" value="'+esc(p[1])+'">'
+      +(sl.length>1?'<button type="button" class="x" data-del="'+k+'" title="Bỏ khung giờ này">✕</button>':'')+'</div>';
+    }).join(''):'<div class="hint" style="margin:7px 0 0">Ngày nghỉ.</div>')
+   +(on&&sl.length<3?'<div><button type="button" class="btn small" data-add>+ Thêm khung giờ</button></div>':'')
+   +'</div></div>';
+ }).join('');
+ $$('.hday',box).forEach(function(row){
+  var i=+row.dataset.d;
+  $('[data-on]',row).addEventListener('change',function(e){
+   HOURS.days[i]=e.target.checked?[['11:00','15:00']]:[];renderHours();dirty();});
+  $$('[data-t]',row).forEach(function(inp){
+   inp.addEventListener('change',function(){
+    var k=+inp.dataset.k,v=hhmm(inp.value);if(!v){inp.value=HOURS.days[i][k][+inp.dataset.t];return;}
+    HOURS.days[i][k][+inp.dataset.t]=v;
+    if(toMin(HOURS.days[i][k][1])<=toMin(HOURS.days[i][k][0]))toast('Giờ đóng phải sau giờ mở — kiểm tra lại '+(k+1)+'.',true);
+    hoursPreview();dirty();});});
+  $$('[data-del]',row).forEach(function(b){b.addEventListener('click',function(){
+   HOURS.days[i].splice(+b.dataset.del,1);renderHours();dirty();});});
+  var add=$('[data-add]',row);
+  if(add)add.addEventListener('click',function(){HOURS.days[i].push(['18:00','21:00']);renderHours();dirty();});
+ });
+ hoursPreview();
+}
+function hoursPreview(){var el=$('#h-preview');if(el)el.textContent=hoursGroupsFr().join('  ·  ');}
+if($('#h-early'))$('#h-early').addEventListener('change',function(e){HOURS.early=clampN(e.target.value,15);e.target.value=HOURS.early;dirty();});
+if($('#h-before'))$('#h-before').addEventListener('change',function(e){HOURS.before=clampN(e.target.value,10);e.target.value=HOURS.before;dirty();});
+
+// ---------------- nội dung trang ----------------
+function defText(k,l){var I=window.I18N||{},d=I[l]||{};if(d[k]!=null)return String(d[k]);var f=I.fr||{};return f[k]!=null?String(f[k]):'';}
+function renderTexts(){
+ var box=$('#tx-fields');if(!box)return;
+ var page=$('#tx-page').value,l=$('#tx-lang').value,fields=TXPAGES[page]||[];
+ box.innerHTML='<h2>'+esc({traiteur:'Traiteur',infos:'Infos',histoire:'Notre histoire'}[page])+' · '+esc(LNAME[l])+'</h2>'
+  +fields.map(function(f){
+   var k=f[0],cur=(TEXTS[k]&&TEXTS[k][l])||'',def=defText(k,l);
+   return '<div class="txf'+(cur?' edited':'')+'" data-k="'+esc(k)+'"><div class="k"><b>'+esc(f[1])+'</b><span>'+esc(k)+(cur?' · đã sửa':'')+'</span></div>'
+    +(f[2]?'<textarea rows="3" placeholder="'+esc(def)+'">'+esc(cur)+'</textarea>'
+         :'<input type="text" placeholder="'+esc(def)+'" value="'+esc(cur)+'">')
+    +'</div>';
+  }).join('');
+ $$('.txf',box).forEach(function(row){
+  var k=row.dataset.k,inp=$('input,textarea',row);
+  inp.addEventListener('input',function(){
+   var v=inp.value;
+   if(v.trim()){TEXTS[k]=TEXTS[k]||{};TEXTS[k][l]=v;}
+   else if(TEXTS[k]){delete TEXTS[k][l];if(!Object.keys(TEXTS[k]).length)delete TEXTS[k];}
+   row.classList.toggle('edited',!!v.trim());dirty();});
+ });
+}
+if($('#tx-lang')){
+ $('#tx-lang').innerHTML=LANGS.map(function(l){return '<option value="'+l+'">'+esc(LNAME[l])+'</option>';}).join('');
+ $('#tx-page').addEventListener('change',renderTexts);
+ $('#tx-lang').addEventListener('change',renderTexts);
+}
+
 // ---------------- lưu ----------------
 function save(){
  var c=changed(),body={};if(!Object.keys(c).length||!online)return;
- if(c.menu)body.menu=JSON.parse(strip(MENU));if(c.semaine)body.semaine=WEEK;if(c.site)body.site=SITE;
+ if(c.menu)body.menu=JSON.parse(strip(MENU));if(c.semaine)body.semaine=WEEK;if(c.site)body.site=SITE;if(c.hours)body.hours=HOURS;if(c.textes)body.textes=TEXTS;
  var noPrice=[];MENU.forEach(function(ct){ct.items.forEach(function(it){if(!it.hide&&/\[|\]/.test(it.price||''))noPrice.push(it.fr[0]||it.id);});});
  $('#save').disabled=true;$('#state').textContent='Đang lưu…';
  fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
@@ -265,7 +371,7 @@ $('#add-item').addEventListener('click',function(){
 function showView(name){
  $$('.views button').forEach(function(x){x.setAttribute('aria-selected',x.dataset.view===name);});
  $$('.view').forEach(function(v){v.hidden=v.id!=='view-'+name;});
- $('#preview').href=name==='menu'||name==='week'?'../menu.html':'../index.html';
+ $('#preview').href={menu:'../menu.html',week:'../menu.html',hours:'../infos.html',texts:'../traiteur.html'}[name]||'../index.html';
  if(name==='github'&&!GH.st)ghStatus();
 }
 $$('.views button').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view);});});
@@ -325,9 +431,13 @@ function ghCount(){
  $('#gh-pull').textContent='Tải '+s.pull.length+' tệp về máy';$('#gh-pull').hidden=!s.pull.length;$('#gh-pull').disabled=dirtyNow;
 }
 function reloadData(){
- return Promise.all([loadScript('../assets/menu.js'),loadScript('../assets/semaine.js'),loadScript('../assets/site.js')]).then(function(){
+ return Promise.all([loadScript('../assets/menu.js'),loadScript('../assets/semaine.js'),loadScript('../assets/site.js'),
+  loadScript('../assets/textes.js'),loadScript('../assets/horaires.js')]).then(function(){
   normalize(window.MENU);WEEK=normWeek(window.SEMAINE);SITE={instagram:(window.SITE&&window.SITE.instagram)||'',facebook:(window.SITE&&window.SITE.facebook)||''};
-  selItem=-1;snap();renderMenuView();renderWeek();renderLinks();loadImages();
+  HOURS=normHours(window.HORAIRES);
+  TEXTS={};txKeys().forEach(function(k){var o=(window.TEXTES||{})[k];if(!o)return;var v={};LANGS.forEach(function(l){if(o[l])v[l]=String(o[l]);});if(Object.keys(v).length)TEXTS[k]=v;});
+  if($('#h-early'))$('#h-early').value=HOURS.early;if($('#h-before'))$('#h-before').value=HOURS.before;
+  selItem=-1;snap();renderMenuView();renderWeek();renderLinks();renderHours();renderTexts();loadImages();
  });
 }
 $('#gh-diff').addEventListener('click',function(){ghDiff();});
@@ -363,7 +473,7 @@ $('#gh-pull').addEventListener('click',function(){
  var b=$('#gh-pull');b.disabled=true;b.textContent='Đang tải…';
  api('pull',{paths:s.pull}).then(function(r){
   toast('Đã tải '+r.files.length+' tệp về máy.');
-  var data=r.files.some(function(f){return /^assets\/(menu|semaine|site)\.js$/.test(f);});
+  var data=r.files.some(function(f){return /^assets\/(menu|semaine|site|textes|horaires)\.js$/.test(f);});
   return (data?reloadData():Promise.resolve()).then(function(){return ghDiff();});
  }).catch(function(e){toast(e.message,true);ghCount();});
 });
@@ -371,13 +481,18 @@ $('#gh-pull').addEventListener('click',function(){
 // ---------------- khởi động ----------------
 fetch('/api/ping',{cache:'no-store'}).then(function(r){online=r.ok;}).catch(function(){online=false;}).then(function(){
  $('#offline').hidden=online;$('#gh-open').disabled=!online;
- return Promise.all([loadScript('../assets/menu.js'),loadScript('../assets/semaine.js'),loadScript('../assets/site.js')]);
+ return Promise.all([loadScript('../assets/menu.js'),loadScript('../assets/semaine.js'),loadScript('../assets/site.js'),
+  loadScript('../assets/i18n.js'),loadScript('../assets/textes.js'),loadScript('../assets/horaires.js')]);
 }).then(function(){
  normalize(window.MENU);WEEK=normWeek(window.SEMAINE);SITE={instagram:(window.SITE&&window.SITE.instagram)||'',facebook:(window.SITE&&window.SITE.facebook)||''};
+ HOURS=normHours(window.HORAIRES);
+ TEXTS={};var keep=txKeys();
+ keep.forEach(function(k){var o=(window.TEXTES||{})[k];if(!o)return;var v={};LANGS.forEach(function(l){if(o[l])v[l]=String(o[l]);});if(Object.keys(v).length)TEXTS[k]=v;});
  snap();
  // các mã món mới sinh ra lần đầu (menu cũ chưa có mã) được tính là thay đổi cần lưu
  var hadIds=(window.MENU||[]).every(function(c){return (c.items||[]).every(function(it){return !!it.id;});});
  if(!hadIds)saved.menu='';
- dirty();renderMenuView();renderWeek();renderLinks();loadImages();
+ dirty();renderMenuView();renderWeek();renderLinks();renderHours();renderTexts();loadImages();
+ if($('#h-early'))$('#h-early').value=HOURS.early;if($('#h-before'))$('#h-before').value=HOURS.before;
 });
 })();

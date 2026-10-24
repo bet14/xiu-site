@@ -13,10 +13,17 @@ Pages : `index.html` (accueil) · `menu.html` · `traiteur.html` · `infos.html`
 
 Mỗi lần lưu, bản cũ được chép vào `admin/backups/`. Trang quản trị chỉ chạy trên máy mình (127.0.0.1).
 
+## Các tab trong trang quản trị
+- **Thực đơn** : danh mục, món, giá, ảnh, mô tả 7 ngôn ngữ.
+- **Giờ mở cửa** : giờ từng ngày (nhiều khung giờ mỗi ngày được). Đây là nguồn duy nhất: đổi ở đây thì dòng « Đang mở / Đã đóng », bảng giờ trang Infos, dòng giờ ở chân trang và việc nhận đơn đặt món (chế độ « Theo giờ mở cửa » ở `/quan-ly`) đều đổi theo. Hai ô phía dưới chỉnh riêng việc nhận đơn: mở sớm hơn bao nhiêu phút, ngừng trước giờ đóng bao nhiêu phút.
+- **Nội dung trang** : sửa chữ của trang Traiteur, Infos và « Notre histoire », từng ngôn ngữ một. Ô để trống thì trang web dùng bản gốc (hiện mờ trong ô làm mẫu).
+- **Mạng xã hội**, **GitHub** : như cũ.
+
 ## Dữ liệu
 - Menu : `assets/menu.js` · ảnh món : `assets/img/menu/`
 - Món của tuần : `assets/semaine.js` · liên kết mạng xã hội : `assets/site.js`
-- Câu chữ các trang : `assets/i18n.js`
+- Giờ mở cửa : `assets/horaires.js` (trang web và `worker/index.js` dùng chung)
+- Chữ các trang : bản gốc `assets/i18n.js`, bản sửa từ trang quản trị `assets/textes.js` (bản sửa được ưu tiên)
 
 ## Đặt món tại tiệm (giai đoạn 2)
 Khách quét mã QR trong tiệm → `menu.html?t=MÃ` → chọn món, gửi đơn → nhân viên nhận ở `/quan-ly`, xác nhận, in phiếu hoặc đọc cho bếp, nhập máy tính tiền như cũ. Không có thanh toán online.

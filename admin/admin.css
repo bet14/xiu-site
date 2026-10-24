@@ -23,7 +23,23 @@ img{display:block;max-width:100%}
 .offline{margin:16px;padding:14px 16px;border-radius:12px;background:#3A1E1B;color:#FFD1CC}
 main{padding:16px}
 .view{display:grid;grid-template-columns:280px minmax(0,1fr) 440px;gap:16px;align-items:start}
-#view-week,#view-links,#view-github{display:block}
+#view-week,#view-links,#view-github,#view-hours,#view-texts{display:block}
+.hday{display:flex;align-items:flex-start;gap:12px;padding:10px 8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.hday:last-child{border-bottom:0}
+.hday>b{width:92px;flex:0 0 92px;padding-top:7px}
+.hday .on-l{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px;padding-top:7px}
+.hslots{flex:1;min-width:240px;display:flex;flex-direction:column;gap:6px}
+.hslot{display:flex;align-items:center;gap:8px}
+.hslot input{min-height:34px;padding:0 8px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+.hslot .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;padding:0 6px}
+.hslot .x:hover{color:#FF8A80}
+.hday.off .hslots{opacity:.35;pointer-events:none}
+.txf{border-bottom:1px solid var(--line);padding:10px 2px}
+.txf:last-child{border-bottom:0}
+.txf .k{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.txf .k b{color:var(--ink);font-size:13.5px}
+.txf input,.txf textarea{width:100%;min-height:36px;padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;resize:vertical}
+.txf.edited input,.txf.edited textarea{border-color:var(--acc)}
 .narrow{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 .col{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
 .editor{position:sticky;top:70px;max-height:calc(100vh - 86px);overflow:auto}
