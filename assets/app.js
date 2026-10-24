@@ -1,6 +1,8 @@
 (function(){
 'use strict';
-var LANGS=['fr','en','de','es','vi','zh','ko'];
+var LANGS=['fr','en','de','es','vi','zh','ko','ja'];
+var LANG_NAME={fr:'Français',en:'English',de:'Deutsch',es:'Español',vi:'Tiếng Việt',zh:'中文',ko:'한국어',ja:'日本語'};
+var LANG_SHORT={fr:'FR',en:'EN',de:'DE',es:'ES',vi:'VI',zh:'中文',ko:'한국어',ja:'日本語'};
 var lang='fr',vegOnly=false,page=document.body.getAttribute('data-page')||'';
 try{var q=new URLSearchParams(location.search).get('lang'),s=localStorage.getItem('xiu-lang');lang=LANGS.indexOf(q)>=0?q:(LANGS.indexOf(s)>=0?s:lang);}catch(e){}
 
@@ -11,7 +13,7 @@ if(page==='home'){var old={'#menu':'menu.html','#semaine':'menu.html','#traiteur
 // để trống thì dùng bản gốc trong assets/i18n.js
 function T(k){var o=window.TEXTES&&window.TEXTES[k];if(o&&o[lang])return o[lang];var d=I18N[lang]||I18N.fr;return d[k]!=null?d[k]:I18N.fr[k];}
 // món chưa dịch: de/es lấy tạm tiếng Anh, các ngôn ngữ khác lấy tiếng Pháp
-function fb(){return lang==='de'||lang==='es'?['en','fr']:['fr'];}
+function fb(){return lang==='de'||lang==='es'||lang==='ja'?['en','fr']:['fr'];}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function $(s,r){return (r||document).querySelector(s);}
 function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
@@ -120,7 +122,7 @@ function renderMenu(){
    rows+='<button type="button" class="dish" data-k="'+k+'" data-id="'+esc(it.id||'')+'"><span class="dt">'
     +'<span class="dn">'+(it.icon?'<span class="ic" aria-hidden="true">'+esc(it.icon)+'</span>':'')+esc(t[0])+'</span>'
     +(sub?'<span class="vi">'+esc(sub)+'</span>':'')
-    +(it.price||it.veg?'<span class="p">'+esc(it.price)+(it.veg?'<span class="veg">'+esc(T('veg'))+'</span>':'')+'</span>':'')
+    +(it.price||it.veg||it.halal?'<span class="p">'+esc(it.price)+(it.veg?'<span class="veg">'+esc(T('veg'))+'</span>':'')+(it.halal?'<span class="veg halal">'+esc(T('halal'))+'</span>':'')+'</span>':'')
     +(t[1]?'<span class="dd">'+esc(t[1])+'</span>':'')+badgeHtml(it)+'</span>'
     +(it.img?'<span class="dimg"><img src="'+esc(imgSrc(it.img))+'" alt="" loading="lazy" width="232" height="232"></span>':'')+'</button>';
   });
@@ -166,7 +168,7 @@ function openDish(it){
  $('.md-badge',d).innerHTML=badgeHtml(it);
  $('.md-name',d).textContent=(it.icon?it.icon+' ':'')+t[0];
  $('.md-vi',d).textContent=viSub(it);
- $('.md-price',d).textContent=[it.price,it.veg?T('veg'):''].filter(Boolean).join(' · ');
+ $('.md-price',d).textContent=[it.price,it.veg?T('veg'):'',it.halal?T('halal'):''].filter(Boolean).join(' · ');
  $('.md-desc',d).textContent=t[1];
  $('.md-call span',d).textContent=T('call');
  hook('onOpen',it,d);
@@ -182,18 +184,36 @@ function wireDialogs(){
 }
 
 // ---------- langue ----------
+// ---------- bộ chọn ngôn ngữ: một nút, bấm mới xổ danh sách dọc ----------
+var GLOBE_SVG='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>';
+var CHEV_SVG='<svg aria-hidden="true" class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+function closeLangs(){$$('.lang-menu').forEach(function(m){m.hidden=true;});$$('.lang-btn').forEach(function(b){b.setAttribute('aria-expanded','false');});}
+function buildLangs(){
+ $$('.langbox').forEach(function(box){
+  box.innerHTML='<button type="button" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Langue / Language">'
+    +GLOBE_SVG+'<span class="lang-cur">'+esc(LANG_SHORT[lang]||lang)+'</span>'+CHEV_SVG+'</button>'
+   +'<ul class="lang-menu" role="listbox" hidden>'+LANGS.map(function(l){
+     return '<li><button type="button" role="option" data-l="'+l+'" aria-selected="'+(l===lang)+'" lang="'+(l==='zh'?'zh-Hans':l)+'">'
+      +'<b>'+esc(LANG_SHORT[l])+'</b><span>'+esc(LANG_NAME[l])+'</span></button></li>';}).join('')+'</ul>';
+  var btn=$('.lang-btn',box),menu=$('.lang-menu',box);
+  btn.addEventListener('click',function(e){e.stopPropagation();var willOpen=menu.hidden;closeLangs();
+   if(willOpen){menu.hidden=false;btn.setAttribute('aria-expanded','true');}});
+  $$('button[data-l]',menu).forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();closeLangs();setLang(b.getAttribute('data-l'));});});
+ });
+}
+document.addEventListener('click',closeLangs);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLangs();});
+
 function apply(){
  document.documentElement.lang=lang==='zh'?'zh-Hans':lang;
  document.body.classList.toggle('ko',lang==='ko');
+ document.body.classList.toggle('ja',lang==='ja');
  $$('[data-i]').forEach(function(el){var v=T(el.getAttribute('data-i'));if(v!=null)el.textContent=v;});
- $$('.langs button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.l===lang);});
- $$('.lang-sel').forEach(function(s){s.value=lang;});
+ buildLangs();
  $$('.md-close').forEach(function(b){b.setAttribute('aria-label',T('close'));});
  paintStatus();paintHours();renderWeek();renderMenu();comtam();setHH();
 }
 function setLang(l){lang=l;try{localStorage.setItem('xiu-lang',lang);}catch(e){}apply();}
-$$('.langs button').forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.l);});});
-$$('.lang-sel').forEach(function(s){s.addEventListener('change',function(){setLang(s.value);});});
 $$('.filters button').forEach(function(b){b.addEventListener('click',function(){vegOnly=b.dataset.f==='veg';$$('.filters button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});renderMenu();var c=$('#carte');if(c)c.scrollIntoView({block:'start'});});});
 
 socials();socialIcons();wireDialogs();apply();

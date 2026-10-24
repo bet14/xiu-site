@@ -24,7 +24,7 @@ IMG_MENU = os.path.join(IMG, "menu")
 BACKUPS = os.path.join(ROOT, "admin", "backups")
 PORT = int(os.environ.get("XIU_PORT", "8765"))
 HOST = "127.0.0.1"
-LANGS = ["fr", "en", "de", "es", "vi", "zh", "ko"]
+LANGS = ["fr", "en", "de", "es", "vi", "zh", "ko", "ja"]
 BADGES = {"", "signature", "top1", "top2", "top3", "populaire", "nouveau"}
 MAX_UPLOAD = 10 * 1024 * 1024
 
@@ -37,6 +37,7 @@ HEAD_MENU = """// ==============================================================
 //   img   : tên ảnh trong assets/img/menu/ (không ghi đuôi = .webp); "" nếu chưa có ảnh
 //   price : giá hiển thị, ví dụ "12,5 €"
 //   veg   : true nếu là món chay (tự hiện thêm trong mục Veggie)
+//   halal : true nếu là món halal (hiện tag halal cạnh giá, mọi ngôn ngữ)
 //   badge : "signature", "top1", "top2", "top3", "populaire", "nouveau" hoặc ""
 //   icon  : biểu tượng trước tên món
 //   hide  : true để tạm ẩn món (hết hàng) mà không xoá
@@ -125,6 +126,8 @@ def clean_menu(menu):
             if badge not in BADGES:
                 badge = ""
             item = {"id": iid, "icon": s(it.get("icon"), 16), "img": img, "price": s(it.get("price"), 40), "veg": bool(it.get("veg"))}
+            if it.get("halal"):
+                item["halal"] = True
             if badge:
                 item["badge"] = badge
             if it.get("hide"):

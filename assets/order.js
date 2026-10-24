@@ -14,19 +14,21 @@ de:{hint:"Mit dem Handy bestellen: Gericht antippen, hinzufügen, absenden. Beza
 es:{hint:"Pide desde el móvil: toca un plato para añadirlo y envía el pedido. Se paga en el mostrador.",add:"Añadir",cart:"Mi cesta",view:"Ver la cesta",send:"Enviar pedido",sending:"Enviando…",total:"Total",pay:"Pago en el mostrador tras la confirmación.",name:"Nombre o n.º de mesa *",note:"Comentario (opcional)",note_ph:"P. ej.: sin cilantro, alergia…",need_name:"Indica tu nombre o el n.º de mesa.",need_note:"Añade un comentario (escribe «nada» si no hay).",empty:"La cesta está vacía.",sent:"Pedido enviado",your_no:"Tu número",show:"Muestra este número en el mostrador para confirmar y pagar.",st_new:"Pendiente de confirmación en el mostrador",st_confirmed:"Confirmado · en preparación",st_done:"Listo · ¡gracias!",st_cancelled:"Cancelado · pasa por el mostrador",st_expired:"Caducado · pasa por el mostrador",again:"Nuevo pedido",closed:"El pedido en línea está cerrado ahora. Pide en el mostrador.",paused:"El pedido en línea está en pausa. Pide en el mostrador.",blocked:"Demasiados pedidos desde este dispositivo. Vuelve a intentarlo en {m} min o pide en el mostrador.",busy:"Hay muchos pedidos en espera. Pide en el mostrador, por favor.",token:"Este código QR ya no es válido. Escanea el código QR de la tienda.",robot:"Falló la verificación anti-robot. Inténtalo de nuevo.",err:"Problema de conexión. Inténtalo de nuevo.",formule:"Menú: pídelo en el mostrador al pagar.",remove:"Quitar",my_order:"Mi pedido",edited:"El pedido se modificó en el mostrador."},
 vi:{hint:"Gọi món bằng điện thoại: chạm vào món để thêm, rồi gửi đơn. Thanh toán tại quầy.",add:"Thêm",cart:"Giỏ hàng",view:"Xem giỏ hàng",send:"Gửi đơn",sending:"Đang gửi…",total:"Tổng cộng",pay:"Thanh toán tại quầy sau khi xác nhận.",name:"Tên hoặc số bàn *",note:"Ghi chú (không bắt buộc)",note_ph:"Ví dụ: không rau mùi, dị ứng…",need_name:"Vui lòng nhập tên hoặc số bàn.",need_note:"Vui lòng ghi chú (ghi « không » nếu không có gì).",empty:"Giỏ hàng đang trống.",sent:"Đã gửi đơn",your_no:"Số của quý khách",show:"Đưa số này tại quầy để xác nhận và thanh toán.",st_new:"Đang chờ xác nhận tại quầy",st_confirmed:"Đã xác nhận · đang chuẩn bị",st_done:"Hoàn tất · cảm ơn quý khách!",st_cancelled:"Đã hủy · vui lòng đến quầy",st_expired:"Hết hạn · vui lòng đến quầy",again:"Đơn mới",closed:"Hiện chưa nhận đơn qua điện thoại. Vui lòng gọi món tại quầy.",paused:"Tạm dừng nhận đơn qua điện thoại. Vui lòng gọi món tại quầy.",blocked:"Thiết bị này đã gửi quá nhiều đơn. Thử lại sau {m} phút hoặc gọi món tại quầy.",busy:"Đang có nhiều đơn chờ. Vui lòng gọi món tại quầy.",token:"Mã QR này đã hết hiệu lực. Vui lòng quét mã QR tại tiệm.",robot:"Kiểm tra chống robot không thành công. Vui lòng thử lại.",err:"Lỗi kết nối. Vui lòng thử lại.",formule:"Combo: vui lòng báo tại quầy khi thanh toán.",remove:"Bỏ",my_order:"Đơn của tôi",edited:"Đơn đã được nhân viên điều chỉnh tại quầy."},
 zh:{hint:"用手机点餐：点击菜品加入，再提交订单。到柜台付款。",add:"加入",cart:"购物车",view:"查看购物车",send:"提交订单",sending:"提交中…",total:"合计",pay:"确认后在柜台付款。",name:"名字或桌号 *",note:"备注（选填）",note_ph:"例如：不要香菜、过敏…",need_name:"请填写名字或桌号。",need_note:"请填写备注（没有请写“无”）。",empty:"购物车是空的。",sent:"订单已提交",your_no:"您的号码",show:"请到柜台出示此号码，确认并付款。",st_new:"等待柜台确认",st_confirmed:"已确认 · 制作中",st_done:"已完成 · 谢谢！",st_cancelled:"已取消 · 请到柜台",st_expired:"已过期 · 请到柜台",again:"再点一单",closed:"目前不接受手机点餐，请到柜台点餐。",paused:"手机点餐已暂停，请到柜台点餐。",blocked:"此设备提交的订单过多。请 {m} 分钟后再试，或到柜台点餐。",busy:"等待中的订单较多，请到柜台点餐。",token:"此二维码已失效，请扫描店内的二维码。",robot:"人机验证失败，请重试。",err:"网络连接问题，请重试。",formule:"套餐：请在柜台付款时说明。",remove:"移除",my_order:"我的订单",edited:"订单已由柜台修改。"},
-ko:{hint:"휴대폰으로 주문하세요: 메뉴를 눌러 담고 주문을 보내세요. 결제는 카운터에서 합니다.",add:"담기",cart:"장바구니",view:"장바구니 보기",send:"주문 보내기",sending:"보내는 중…",total:"합계",pay:"확인 후 카운터에서 결제합니다.",name:"이름 또는 테이블 번호 *",note:"요청 사항 (선택)",note_ph:"예: 고수 빼기, 알레르기…",need_name:"이름 또는 테이블 번호를 입력해 주세요.",need_note:"요청 사항을 입력해 주세요 (없으면 “없음”).",empty:"장바구니가 비어 있습니다.",sent:"주문이 전송되었습니다",your_no:"주문 번호",show:"카운터에서 이 번호를 보여 주시고 확인 후 결제해 주세요.",st_new:"카운터 확인 대기 중",st_confirmed:"확인됨 · 준비 중",st_done:"완료 · 감사합니다!",st_cancelled:"취소됨 · 카운터로 와 주세요",st_expired:"만료됨 · 카운터로 와 주세요",again:"새 주문",closed:"지금은 온라인 주문을 받지 않습니다. 카운터에서 주문해 주세요.",paused:"온라인 주문이 일시 중지되었습니다. 카운터에서 주문해 주세요.",blocked:"이 기기에서 주문이 너무 많습니다. {m}분 후 다시 시도하거나 카운터에서 주문해 주세요.",busy:"대기 중인 주문이 많습니다. 카운터에서 주문해 주세요.",token:"이 QR 코드는 더 이상 유효하지 않습니다. 매장의 QR 코드를 스캔해 주세요.",robot:"로봇 확인에 실패했습니다. 다시 시도해 주세요.",err:"연결 문제가 발생했습니다. 다시 시도해 주세요.",formule:"세트 메뉴: 결제할 때 카운터에 말씀해 주세요.",remove:"빼기",my_order:"내 주문",edited:"카운터에서 주문이 수정되었습니다."}
+ko:{hint:"휴대폰으로 주문하세요: 메뉴를 눌러 담고 주문을 보내세요. 결제는 카운터에서 합니다.",add:"담기",cart:"장바구니",view:"장바구니 보기",send:"주문 보내기",sending:"보내는 중…",total:"합계",pay:"확인 후 카운터에서 결제합니다.",name:"이름 또는 테이블 번호 *",note:"요청 사항 (선택)",note_ph:"예: 고수 빼기, 알레르기…",need_name:"이름 또는 테이블 번호를 입력해 주세요.",need_note:"요청 사항을 입력해 주세요 (없으면 “없음”).",empty:"장바구니가 비어 있습니다.",sent:"주문이 전송되었습니다",your_no:"주문 번호",show:"카운터에서 이 번호를 보여 주시고 확인 후 결제해 주세요.",st_new:"카운터 확인 대기 중",st_confirmed:"확인됨 · 준비 중",st_done:"완료 · 감사합니다!",st_cancelled:"취소됨 · 카운터로 와 주세요",st_expired:"만료됨 · 카운터로 와 주세요",again:"새 주문",closed:"지금은 온라인 주문을 받지 않습니다. 카운터에서 주문해 주세요.",paused:"온라인 주문이 일시 중지되었습니다. 카운터에서 주문해 주세요.",blocked:"이 기기에서 주문이 너무 많습니다. {m}분 후 다시 시도하거나 카운터에서 주문해 주세요.",busy:"대기 중인 주문이 많습니다. 카운터에서 주문해 주세요.",token:"이 QR 코드는 더 이상 유효하지 않습니다. 매장의 QR 코드를 스캔해 주세요.",robot:"로봇 확인에 실패했습니다. 다시 시도해 주세요.",err:"연결 문제가 발생했습니다. 다시 시도해 주세요.",formule:"세트 메뉴: 결제할 때 카운터에 말씀해 주세요.",remove:"빼기",my_order:"내 주문",edited:"카운터에서 주문이 수정되었습니다."},
+ja:{hint:"スマホでご注文：料理をタップして追加し、注文を送信してください。お支払いはカウンターで。",add:"追加",cart:"カート",view:"カートを見る",send:"注文を送信",sending:"送信中…",total:"合計",pay:"確認後、カウンターでお支払いください。",name:"お名前またはテーブル番号 *",note:"ご要望（任意）",note_ph:"例：パクチー抜き、アレルギーなど",need_name:"お名前またはテーブル番号をご入力ください。",need_note:"ご要望をご記入ください（なければ「なし」）。",empty:"カートは空です。",sent:"注文を送信しました",your_no:"お客様の番号",show:"この番号をカウンターでお見せのうえ、確認してお支払いください。",st_new:"カウンターでの確認待ち",st_confirmed:"確認済み · 調理中",st_done:"完了 · ありがとうございました！",st_cancelled:"キャンセル · カウンターへお越しください",st_expired:"期限切れ · カウンターへお越しください",again:"新しい注文",closed:"現在オンライン注文は受け付けていません。カウンターでご注文ください。",paused:"オンライン注文を一時停止しています。カウンターでご注文ください。",blocked:"この端末からの注文が多すぎます。{m}分後にもう一度お試しいただくか、カウンターでご注文ください。",busy:"待機中の注文が多くなっています。カウンターでご注文ください。",token:"このQRコードは無効です。店内のQRコードを読み取ってください。",robot:"ロボット確認に失敗しました。もう一度お試しください。",err:"接続に問題が発生しました。もう一度お試しください。",formule:"セットメニュー：お支払いの際にカウンターでお申し付けください。",remove:"削除",my_order:"自分の注文",edited:"注文がカウンターで変更されました。"}
 };
-var LOC={fr:'fr-FR',en:'en-GB',de:'de-DE',es:'es-ES',vi:'vi-VN',zh:'zh-CN',ko:'ko-KR'};
+var LOC={fr:'fr-FR',en:'en-GB',de:'de-DE',es:'es-ES',vi:'vi-VN',zh:'zh-CN',ko:'ko-KR',ja:'ja-JP'};
 
 // chuỗi bổ sung: combo, nút thêm nhanh
 (function(A){for(var l in A)for(var k in A[l])S[l][k]=A[l][k];})({
-fr:{free:"Offert",f_note:"Formule appliquée automatiquement : soda, thé ou café offert avec entrée + plat, à 1 € avec entrée + bánh mì. Bière non comprise. Choix du soda au comptoir.",svc_l:"Sur place ou à emporter ?",place:"Sur place",emporter:"À emporter",svc_need:"Choisissez sur place ou à emporter.",g_entree:"Entrées",g_plat:"Plats",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Boissons",g_autre:"Autres",upsell:"Ajoutez une entrée (nems, rouleau) pour la formule : boisson offerte avec un plat, à 1 € avec un bánh mì.",added:"Ajouté"},
-en:{free:"Free",f_note:"Set menu applied automatically: soda, tea or coffee free with starter + main, €1 with starter + bánh mì. Beer not included. Choose your soda at the counter.",svc_l:"Eat in or take away?",place:"Eat in",emporter:"Take away",svc_need:"Please choose eat in or take away.",g_entree:"Starters",g_plat:"Main dishes",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Drinks",g_autre:"Other",upsell:"Add a starter (nems, roll) for the set menu: free drink with a main dish, €1 with a bánh mì.",added:"Added"},
-de:{free:"Gratis",f_note:"Menü automatisch angewendet: Softdrink, Tee oder Kaffee gratis zu Vorspeise + Hauptgericht, 1 € zu Vorspeise + Bánh mì. Bier ausgenommen. Softdrink an der Theke wählen.",svc_l:"Hier essen oder mitnehmen?",place:"Hier essen",emporter:"Zum Mitnehmen",svc_need:"Bitte wählen: hier essen oder mitnehmen.",g_entree:"Vorspeisen",g_plat:"Hauptgerichte",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Getränke",g_autre:"Sonstiges",upsell:"Mit einer Vorspeise (Nems, Rolle) gibt es das Menü: Getränk gratis zum Hauptgericht, 1 € zum Bánh mì.",added:"Hinzugefügt"},
-es:{free:"Gratis",f_note:"Menú aplicado automáticamente: refresco, té o café gratis con entrante + plato, a 1 € con entrante + bánh mì. Cerveza no incluida. Elige el refresco en el mostrador.",svc_l:"¿Para tomar aquí o para llevar?",place:"Para tomar aquí",emporter:"Para llevar",svc_need:"Elige: para tomar aquí o para llevar.",g_entree:"Entrantes",g_plat:"Platos",g_banhmi:"Bánh mì",g_dessert:"Postres",g_boisson:"Bebidas",g_autre:"Otros",upsell:"Añade un entrante (nems, rollito) para el menú: bebida gratis con un plato, a 1 € con un bánh mì.",added:"Añadido"},
-vi:{free:"Tặng",f_note:"Combo tự áp dụng: nước ngọt, trà hoặc cà phê được tặng khi có khai vị + món chính, còn 1 € khi có khai vị + bánh mì. Không áp dụng cho bia. Chọn loại nước ngọt tại quầy.",svc_l:"Ăn tại chỗ hay mang đi?",place:"Ăn tại chỗ",emporter:"Mang đi",svc_need:"Vui lòng chọn ăn tại chỗ hoặc mang đi.",g_entree:"Khai vị",g_plat:"Món chính",g_banhmi:"Bánh mì",g_dessert:"Tráng miệng",g_boisson:"Đồ uống",g_autre:"Khác",upsell:"Thêm một món khai vị (chả giò, gỏi cuốn) để được combo: tặng nước khi gọi món chính, nước 1 € khi gọi bánh mì.",added:"Đã thêm"},
-zh:{free:"免费",f_note:"套餐自动生效：前菜+主菜送汽水、茶或咖啡；前菜+越南法包饮料仅 1 欧元。啤酒除外。汽水口味请在柜台选择。",svc_l:"堂食还是外带？",place:"堂食",emporter:"外带",svc_need:"请选择堂食或外带。",g_entree:"前菜",g_plat:"主菜",g_banhmi:"越南法包",g_dessert:"甜点",g_boisson:"饮料",g_autre:"其他",upsell:"加一份前菜（炸春卷、春卷）即享套餐：配主菜送饮料，配越南法包饮料仅 1 欧元。",added:"已加入"},
-ko:{free:"무료",f_note:"세트 자동 적용: 애피타이저+메인 시 탄산음료·차·커피 무료, 애피타이저+반미 시 1유로. 맥주 제외. 탄산음료는 카운터에서 고르세요.",svc_l:"매장 식사 또는 포장?",place:"매장 식사",emporter:"포장",svc_need:"매장 식사 또는 포장을 선택해 주세요.",g_entree:"애피타이저",g_plat:"메인 요리",g_banhmi:"반미",g_dessert:"디저트",g_boisson:"음료",g_autre:"기타",upsell:"애피타이저(넴, 롤)를 추가하면 세트 혜택: 메인 요리와 함께 음료 무료, 반미와 함께 음료 1유로.",added:"담았습니다"}
+fr:{free:"Offert",f_note:"Formule appliquée automatiquement : soda, thé ou café offert avec entrée + plat, à 1 € avec entrée + bánh mì. Bière non comprise. Choix du soda au comptoir.",svc_l:"Sur place ou à emporter ?",place:"Sur place",emporter:"À emporter",svc_need:"Choisissez sur place ou à emporter.",g_entree:"Entrées",g_plat:"Plats",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Boissons",g_autre:"Autres",upsell:"Ajoutez une entrée (nems, rouleau) pour la formule : boisson offerte avec un plat, à 1 € avec un bánh mì.",added:"Ajouté",back:"Retour",compose:"Composer la formule",step:"Étape",no_drink:"Sans boisson",recap:"Votre formule",add_cart:"Ajouter au panier",change:"Modifier",upsell_cta:"Choisir une entrée",pick_starter:"Choisissez une entrée",pick_main:"Choisissez un plat",pick_banhmi:"Choisissez un bánh mì",pick_drink:"Choisissez une boisson"},
+en:{free:"Free",f_note:"Set menu applied automatically: soda, tea or coffee free with starter + main, €1 with starter + bánh mì. Beer not included. Choose your soda at the counter.",svc_l:"Eat in or take away?",place:"Eat in",emporter:"Take away",svc_need:"Please choose eat in or take away.",g_entree:"Starters",g_plat:"Main dishes",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Drinks",g_autre:"Other",upsell:"Add a starter (nems, roll) for the set menu: free drink with a main dish, €1 with a bánh mì.",added:"Added",back:"Back",compose:"Build the set menu",step:"Step",no_drink:"No drink",recap:"Your set menu",add_cart:"Add to basket",change:"Change",upsell_cta:"Choose a starter",pick_starter:"Choose a starter",pick_main:"Choose a main dish",pick_banhmi:"Choose a bánh mì",pick_drink:"Choose a drink"},
+de:{free:"Gratis",f_note:"Menü automatisch angewendet: Softdrink, Tee oder Kaffee gratis zu Vorspeise + Hauptgericht, 1 € zu Vorspeise + Bánh mì. Bier ausgenommen. Softdrink an der Theke wählen.",svc_l:"Hier essen oder mitnehmen?",place:"Hier essen",emporter:"Zum Mitnehmen",svc_need:"Bitte wählen: hier essen oder mitnehmen.",g_entree:"Vorspeisen",g_plat:"Hauptgerichte",g_banhmi:"Bánh mì",g_dessert:"Desserts",g_boisson:"Getränke",g_autre:"Sonstiges",upsell:"Mit einer Vorspeise (Nems, Rolle) gibt es das Menü: Getränk gratis zum Hauptgericht, 1 € zum Bánh mì.",added:"Hinzugefügt",back:"Zurück",compose:"Menü zusammenstellen",step:"Schritt",no_drink:"Ohne Getränk",recap:"Ihr Menü",add_cart:"In den Warenkorb",change:"Ändern",upsell_cta:"Vorspeise wählen",pick_starter:"Vorspeise wählen",pick_main:"Hauptgericht wählen",pick_banhmi:"Bánh mì wählen",pick_drink:"Getränk wählen"},
+es:{free:"Gratis",f_note:"Menú aplicado automáticamente: refresco, té o café gratis con entrante + plato, a 1 € con entrante + bánh mì. Cerveza no incluida. Elige el refresco en el mostrador.",svc_l:"¿Para tomar aquí o para llevar?",place:"Para tomar aquí",emporter:"Para llevar",svc_need:"Elige: para tomar aquí o para llevar.",g_entree:"Entrantes",g_plat:"Platos",g_banhmi:"Bánh mì",g_dessert:"Postres",g_boisson:"Bebidas",g_autre:"Otros",upsell:"Añade un entrante (nems, rollito) para el menú: bebida gratis con un plato, a 1 € con un bánh mì.",added:"Añadido",back:"Volver",compose:"Montar el menú",step:"Paso",no_drink:"Sin bebida",recap:"Tu menú",add_cart:"Añadir a la cesta",change:"Cambiar",upsell_cta:"Elegir un entrante",pick_starter:"Elige un entrante",pick_main:"Elige un plato",pick_banhmi:"Elige un bánh mì",pick_drink:"Elige una bebida"},
+vi:{free:"Tặng",f_note:"Combo tự áp dụng: nước ngọt, trà hoặc cà phê được tặng khi có khai vị + món chính, còn 1 € khi có khai vị + bánh mì. Không áp dụng cho bia. Chọn loại nước ngọt tại quầy.",svc_l:"Ăn tại chỗ hay mang đi?",place:"Ăn tại chỗ",emporter:"Mang đi",svc_need:"Vui lòng chọn ăn tại chỗ hoặc mang đi.",g_entree:"Khai vị",g_plat:"Món chính",g_banhmi:"Bánh mì",g_dessert:"Tráng miệng",g_boisson:"Đồ uống",g_autre:"Khác",upsell:"Thêm một món khai vị (chả giò, gỏi cuốn) để được combo: tặng nước khi gọi món chính, nước 1 € khi gọi bánh mì.",added:"Đã thêm",back:"Quay lại",compose:"Chọn combo",step:"Bước",no_drink:"Không lấy nước",recap:"Combo của quý khách",add_cart:"Thêm vào giỏ",change:"Đổi",upsell_cta:"Chọn món khai vị",pick_starter:"Chọn món khai vị",pick_main:"Chọn món chính",pick_banhmi:"Chọn bánh mì",pick_drink:"Chọn đồ uống"},
+zh:{free:"免费",f_note:"套餐自动生效：前菜+主菜送汽水、茶或咖啡；前菜+越南法包饮料仅 1 欧元。啤酒除外。汽水口味请在柜台选择。",svc_l:"堂食还是外带？",place:"堂食",emporter:"外带",svc_need:"请选择堂食或外带。",g_entree:"前菜",g_plat:"主菜",g_banhmi:"越南法包",g_dessert:"甜点",g_boisson:"饮料",g_autre:"其他",upsell:"加一份前菜（炸春卷、春卷）即享套餐：配主菜送饮料，配越南法包饮料仅 1 欧元。",added:"已加入",back:"返回",compose:"搭配套餐",step:"步骤",no_drink:"不要饮料",recap:"您的套餐",add_cart:"加入购物车",change:"更改",upsell_cta:"选择前菜",pick_starter:"请选择前菜",pick_main:"请选择主菜",pick_banhmi:"请选择越南法包",pick_drink:"请选择饮料"},
+ko:{free:"무료",f_note:"세트 자동 적용: 애피타이저+메인 시 탄산음료·차·커피 무료, 애피타이저+반미 시 1유로. 맥주 제외. 탄산음료는 카운터에서 고르세요.",svc_l:"매장 식사 또는 포장?",place:"매장 식사",emporter:"포장",svc_need:"매장 식사 또는 포장을 선택해 주세요.",g_entree:"애피타이저",g_plat:"메인 요리",g_banhmi:"반미",g_dessert:"디저트",g_boisson:"음료",g_autre:"기타",upsell:"애피타이저(넴, 롤)를 추가하면 세트 혜택: 메인 요리와 함께 음료 무료, 반미와 함께 음료 1유로.",added:"담았습니다",back:"뒤로",compose:"세트 구성하기",step:"단계",no_drink:"음료 없음",recap:"선택한 세트",add_cart:"장바구니에 담기",change:"변경",upsell_cta:"애피타이저 고르기",pick_starter:"애피타이저를 고르세요",pick_main:"메인 요리를 고르세요",pick_banhmi:"반미를 고르세요",pick_drink:"음료를 고르세요"},
+ja:{free:"無料",f_note:"セットが自動で適用されます：前菜＋メインでソフトドリンク・お茶・コーヒーが無料、前菜＋バインミーで1€。ビールは対象外。ソフトドリンクの種類はカウンターでお選びください。",svc_l:"店内でお召し上がりですか、お持ち帰りですか？",place:"店内で",emporter:"持ち帰り",svc_need:"店内かお持ち帰りかをお選びください。",g_entree:"前菜",g_plat:"メイン料理",g_banhmi:"バインミー",g_dessert:"デザート",g_boisson:"ドリンク",g_autre:"その他",upsell:"前菜（揚げ春巻き、生春巻き）を追加するとセットに：メイン料理ならドリンク無料、バインミーなら1€。",added:"追加しました",back:"戻る",compose:"セットを組み立てる",step:"ステップ",no_drink:"ドリンクなし",recap:"お客様のセット",add_cart:"カートに追加",change:"変更",upsell_cta:"前菜を選ぶ",pick_starter:"前菜をお選びください",pick_main:"メイン料理をお選びください",pick_banhmi:"バインミーをお選びください",pick_drink:"ドリンクをお選びください"}
 });
 
 function L(){return X.lang();}
@@ -96,21 +98,24 @@ var hint=el('div','ord-hint');var cats=$('#cats');cats.parentNode.insertBefore(h
 var bar=el('div','obar');bar.hidden=true;document.body.appendChild(bar);
 var cartDlg=el('dialog','sheet ocart');cartDlg.id='ord-cart';document.body.appendChild(cartDlg);
 var doneDlg=el('dialog','sheet odone');doneDlg.id='ord-done';document.body.appendChild(doneDlg);
-[cartDlg,doneDlg].forEach(function(d){d.addEventListener('click',function(e){if(e.target===d)d.close();});});
+var comboDlg=el('dialog','sheet ocombo');comboDlg.id='ord-combo';document.body.appendChild(comboDlg);
+[cartDlg,doneDlg,comboDlg].forEach(function(d){d.addEventListener('click',function(e){if(e.target===d)d.close();});});
 function openDlg(d){if(d.showModal){if(!d.open)d.showModal();}else d.setAttribute('open','');}
 var X_SVG='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 var PLUS_SVG='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+var BACK_SVG='<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+function backBtn(){return '<button type="button" class="sheet-back" aria-label="'+esc(t('back'))+'">'+BACK_SVG+'</button>';}
 
 // nút « + » trên từng món (đặt cạnh nút món, không lồng vào trong)
 function decorate(){
  $$('#cats .dish').forEach(function(b){
-  var id=b.getAttribute('data-id'),w=b.parentNode,want=canOrder()&&priceOf(ITEMS[id]);
+  var id=b.getAttribute('data-id'),w=b.parentNode,want=canOrder()&&ITEMS[id]&&(priceOf(ITEMS[id])||isFormule(id));
   if(!w.classList.contains('dwrap')){if(!want)return;w=el('div','dwrap');b.parentNode.insertBefore(w,b);w.appendChild(b);}
   w.classList.toggle('has-img',!!$('.dimg',b));
   var a=$('.dadd',w);
   if(!want){if(a)a.remove();return;}
-  if(!a){a=el('button','dadd',PLUS_SVG);a.type='button';a.addEventListener('click',function(e){e.stopPropagation();setQty(id,(cart[id]||0)+1);bump(a);});w.appendChild(a);}
-  a.setAttribute('aria-label',t('add')+' · '+X.txt(ITEMS[id])[0]);
+  if(!a){a=el('button','dadd',PLUS_SVG);a.type='button';a.addEventListener('click',function(e){e.stopPropagation();if(isFormule(id))comboOpen(id);else{setQty(id,(cart[id]||0)+1);bump(a);}});w.appendChild(a);}
+  a.setAttribute('aria-label',(isFormule(id)?t('compose'):t('add'))+' · '+X.txt(ITEMS[id])[0]);
  });
 }
 function bump(a){a.classList.remove('bump');void a.offsetWidth;a.classList.add('bump');var c=$('.ob-cart',bar);if(c){c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');}}
@@ -140,7 +145,13 @@ function onOpen(it,d){
  if(!box){box=el('div','md-order');body.appendChild(box);}
  if(call)call.hidden=true;
  var p=priceOf(it);
- if(!p){box.innerHTML='<p class="md-note">'+esc(FORM.some(function(f){return f.id===it.id;})?t('f_note'):t('formule'))+'</p>';return;}
+ if(!p){
+  if(isFormule(it.id)){
+   box.innerHTML='<p class="md-note">'+esc(t('f_note'))+'</p>'
+    +(canOrder()?'<button type="button" class="btn btn-red btn-lg md-combo">'+esc(t('compose'))+'</button>':'<p class="md-note off">'+esc(reasonText())+'</p>');
+   var cb=$('.md-combo',box);if(cb)cb.addEventListener('click',function(){d.close();comboOpen(it.id);});
+  }else box.innerHTML='<p class="md-note">'+esc(t('formule'))+'</p>';
+  return;}
  if(!canOrder()){box.innerHTML='<p class="md-note off">'+esc(reasonText())+'</p>';return;}
  var q=1;
  function draw(){box.innerHTML='<div class="stepper"><button type="button" class="st-m" aria-label="−">−</button><span class="st-q">'+q+'</span><button type="button" class="st-p" aria-label="+">+</button></div>'
@@ -149,6 +160,88 @@ function onOpen(it,d){
   $('.st-p',box).addEventListener('click',function(){if(q<10){q++;draw();}});
   $('.md-add',box).addEventListener('click',function(){setQty(it.id,(cart[it.id]||0)+q);d.close();});}
  draw();
+}
+
+// ---------- combo (formule) kiểu McDo: khai vị → món chính → nước → xem lại
+function isFormule(id){for(var i=0;i<FORM.length;i++)if(FORM[i].id===id)return true;return false;}
+function formuleOf(id){for(var i=0;i<FORM.length;i++)if(FORM[i].id===id)return FORM[i];return null;}
+function groupOfId(id){return CALC?CALC.groupOf(CFG,id,CAT[id]):'autre';}
+function itemsOfGroup(g){var out=[];(window.MENU||[]).forEach(function(c){(c.items||[]).forEach(function(it){
+ if(!it.id||ITEMS[it.id]!==it||!priceOf(it))return;if(groupOfId(it.id)===g)out.push(it);});});return out;}
+function drinkList(){return (CFG.drinks||[]).map(function(id){return ITEMS[id];}).filter(function(it){return it&&priceOf(it);});}
+var combo=null;
+comboDlg.addEventListener('close',function(){combo=null;});
+function comboSteps(f){return [{k:'starter',g:f.starter},{k:'main',g:f.main},{k:'drink'},{k:'recap'}];}
+function stepTitle(st,f){
+ if(st.k==='starter')return t('pick_starter');
+ if(st.k==='main')return f.main==='banhmi'?t('pick_banhmi'):t('pick_main');
+ if(st.k==='drink')return t('pick_drink');
+ return t('recap');
+}
+function comboOpen(id){var f=formuleOf(id);if(!f||!canOrder())return;combo={f:f,i:0,pick:{}};renderCombo();openDlg(comboDlg);}
+function choiceHtml(it,c,b,on,k){
+ var v={img:it.img?X.img(it.img):''};
+ return '<button type="button" class="oc-pick'+(on?' on':'')+'" data-k="'+esc(k)+'" data-id="'+esc(it.id)+'">'+thumb(v)
+  +'<span class="op-n"><b>'+esc(X.txt(it)[0])+'</b>'+(it.veg?'<i class="op-tag">'+esc(X.T('veg'))+'</i>':'')+(it.halal?'<i class="op-tag h">'+esc(X.T('halal'))+'</i>':'')+'</span>'
+  +'<span class="op-p">'+(b>c?'<s>'+esc(money(b))+'</s> ':'')+esc(c?money(c):t('free'))+'</span></button>';
+}
+function comboLines(){
+ var f=combo.f,p=combo.pick,dc=Math.max(0,f.drink_cents|0),out=[];
+ out.push({k:'starter',step:0,id:p.starter||'',c:p.starter?(cents(ITEMS[p.starter]&&ITEMS[p.starter].price)||0):0});
+ out.push({k:'main',step:1,id:p.main||'',c:p.main?(cents(ITEMS[p.main]&&ITEMS[p.main].price)||0):0});
+ out.push({k:'drink',step:2,id:p.drink||'',c:p.drink?dc:0});
+ return out;
+}
+function renderCombo(){
+ if(!combo)return;
+ var f=combo.f,steps=comboSteps(f),st=steps[combo.i],fo=ALL[f.id];
+ var h='<div class="sheet-head">'+backBtn()+'<b>'+esc(fo?X.txt(fo)[0]:t('compose'))+'</b>'
+  +'<button type="button" class="md-close sheet-x" aria-label="'+esc(X.T('close'))+'">'+X_SVG+'</button></div><div class="oc-body">';
+ h+='<div class="op-steps">'+[0,1,2].map(function(i){return '<span class="op-dot'+(i===combo.i?' on':(i<combo.i?' done':''))+'"></span>';}).join('')
+  +'<em>'+esc(combo.i<3?t('step')+' '+(combo.i+1)+'/3':t('recap'))+'</em></div>';
+ h+='<h4 class="op-t">'+esc(stepTitle(st,f))+'</h4>';
+ if(st.k==='recap'){
+  var ls=comboLines(),tot=0;
+  h+='<ul class="op-recap">'+ls.map(function(l){
+   var it=l.id&&ITEMS[l.id];tot+=l.c;
+   return '<li><span class="oc-img">'+(it&&it.img?'<img src="'+esc(X.img(it.img))+'" alt="" loading="lazy" width="56" height="56">':'')+'</span>'
+    +'<span class="op-n"><small>'+esc(t('g_'+(l.k==='drink'?'boisson':l.k==='starter'?'entree':f.main)))+'</small><b>'+esc(it?X.txt(it)[0]:t('no_drink'))+'</b></span>'
+    +'<span class="op-p">'+(it?esc(l.c?money(l.c):t('free')):'')+'</span>'
+    +'<button type="button" class="op-edit" data-step="'+l.step+'">'+esc(t('change'))+'</button></li>';}).join('')+'</ul>';
+  h+='<div class="oc-total"><span>'+esc(t('total'))+'</span><b>'+esc(money(tot))+'</b></div>'
+   +'<button type="button" class="btn btn-red btn-lg oc-add"'+(combo.pick.starter&&combo.pick.main?'':' disabled')+'>'+esc(t('add_cart'))+'</button>';
+ }else if(st.k==='drink'){
+  var dc2=Math.max(0,f.drink_cents|0);
+  h+='<div class="op-list">'+drinkList().map(function(it){return choiceHtml(it,dc2,cents(it.price)||0,combo.pick.drink===it.id,'drink');}).join('')
+   +'<button type="button" class="oc-pick skip" data-k="drink" data-id=""><span class="op-n"><b>'+esc(t('no_drink'))+'</b></span></button></div>';
+ }else{
+  h+='<div class="op-list">'+itemsOfGroup(st.g).map(function(it){var c=cents(it.price)||0;
+   return choiceHtml(it,c,c,combo.pick[st.k]===it.id,st.k);}).join('')+'</div>';
+ }
+ h+='</div>';
+ comboDlg.innerHTML=h;comboDlg.scrollTop=0;
+ $('.sheet-x',comboDlg).addEventListener('click',function(){comboDlg.close();});
+ $('.sheet-back',comboDlg).addEventListener('click',function(){if(combo.i>0){combo.i--;renderCombo();}else comboDlg.close();});
+ $$('.oc-pick',comboDlg).forEach(function(b){b.addEventListener('click',function(){
+  combo.pick[b.getAttribute('data-k')]=b.getAttribute('data-id');
+  if(combo.i<3)combo.i++;renderCombo();});});
+ $$('.op-edit',comboDlg).forEach(function(b){b.addEventListener('click',function(){combo.i=+b.getAttribute('data-step');renderCombo();});});
+ var ad=$('.oc-add',comboDlg);if(ad)ad.addEventListener('click',comboAdd);
+}
+function comboAdd(){
+ if(!combo)return;var f=combo.f,p=combo.pick;
+ [p.starter,p.main,p.drink].forEach(function(id){if(id&&ITEMS[id])cart[id]=Math.min(10,(cart[id]||0)+1);});
+ if(!p.drink&&f.auto!==false){decl[f.id]=(decl[f.id]||0)+1;store('xiu-decl',decl);}
+ store('xiu-cart',cart);combo=null;comboDlg.close();paint();showCart();
+}
+// nhảy tới một nhóm món trong thực đơn (dùng cho lời mời thêm khai vị)
+function gotoGroup(key){
+ var g=(CFG.groups||[]).filter(function(x){return x.key===key;})[0],box=null;
+ (((g&&g.cats)||[])).forEach(function(cid){if(!box)box=document.getElementById('cat-'+cid);});
+ if(cartDlg.open)cartDlg.close();
+ if(!box)return;
+ box.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+ box.classList.add('flash');setTimeout(function(){box.classList.remove('flash');},1800);
 }
 
 // ---------- giỏ hàng
@@ -160,7 +253,7 @@ function groupedList(ls,row){
 }
 function renderCart(msg){
  cleanCart();
- var c=calc(),ls=c.lines,h='<div class="sheet-head"><b>'+esc(t('cart'))+'</b><button type="button" class="md-close sheet-x" aria-label="'+esc(X.T('close'))+'">'+X_SVG+'</button></div><div class="oc-body">';
+ var c=calc(),ls=c.lines,h='<div class="sheet-head">'+backBtn()+'<b>'+esc(t('cart'))+'</b><button type="button" class="md-close sheet-x" aria-label="'+esc(X.T('close'))+'">'+X_SVG+'</button></div><div class="oc-body">';
  if(!Object.keys(cart).length)h+='<p class="oc-empty">'+esc(t('empty'))+'</p>';
  else{
   h+='<ul class="oc-list">'+groupedList(ls,function(l,i){var v=lineView(l);
@@ -169,7 +262,7 @@ function renderCart(msg){
     +'<div class="stepper sm"><button type="button" class="st-m" aria-label="−">−</button><span class="st-q">'+l.qty+'</span><button type="button" class="st-p" aria-label="+"'+(l.auto&&l.qty>=l.max?' disabled':'')+'>+</button></div>'
     +'<div class="oc-sum">'+priceHtml(l,l.qty)+'</div></li>';})+'</ul>';
   if(c.lines.some(function(l){return l.fid;}))h+='<p class="oc-info">'+esc(t('f_note'))+'</p>';
-  else if(c.upsell)h+='<p class="oc-info up">'+esc(t('upsell'))+'</p>';
+  else if(c.upsell)h+='<button type="button" class="oc-info up oc-up"><span>'+esc(t('upsell'))+'</span><b>'+esc(t('upsell_cta'))+'</b></button>';
   var f=load('xiu-form')||{};
   h+='<div class="oc-svc"><span>'+esc(t('svc_l'))+'</span><div class="seg2" role="radiogroup">'
    +['place','emporter'].map(function(v){return '<button type="button" role="radio" aria-checked="'+(service===v)+'" data-svc="'+v+'">'+esc(t(v))+'</button>';}).join('')+'</div></div>'
@@ -184,6 +277,7 @@ function renderCart(msg){
  h+='</div>';
  var sc=cartDlg.scrollTop;cartDlg.innerHTML=h;cartDlg.scrollTop=sc;
  $('.sheet-x',cartDlg).addEventListener('click',function(){cartDlg.close();});
+ $('.sheet-back',cartDlg).addEventListener('click',function(){cartDlg.close();});
  $$('.oc-list li.oc-line',cartDlg).forEach(function(li){var l=ls[+li.getAttribute('data-i')];
   $('.st-m',li).addEventListener('click',function(){if(l.auto)setDecl(l.fid,l.max,l.qty-1);else setQty(l.id,(cart[l.id]||0)-1);});
   $('.st-p',li).addEventListener('click',function(){if(l.auto)setDecl(l.fid,l.max,l.qty+1);else setQty(l.id,(cart[l.id]||0)+1);});});
@@ -191,6 +285,7 @@ function renderCart(msg){
  var n=$('.oc-n',cartDlg),no=$('.oc-note',cartDlg);
  function keep(){store('xiu-form',{name:n.value,note:no.value});if(this&&this.classList)this.classList.remove('need');}
  if(n){n.addEventListener('input',keep);no.addEventListener('input',keep);}
+ var up=$('.oc-up',cartDlg);if(up)up.addEventListener('click',function(){gotoGroup(((CFG.formules||[])[0]||{}).starter||'entree');});
  var b=$('.oc-send',cartDlg);if(b)b.addEventListener('click',send);
  if(Object.keys(cart).length&&info&&info.sitekey)turnstile($('.oc-ts',cartDlg));
 }

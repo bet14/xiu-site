@@ -18,7 +18,7 @@
 import CALC from '../assets/formule-calc.js';
 import HORAIRES from '../assets/horaires.js';
 
-const LANGS = ['fr', 'en', 'de', 'es', 'vi', 'zh', 'ko'];
+const LANGS = ['fr', 'en', 'de', 'es', 'vi', 'zh', 'ko', 'ja'];
 const SERVICES = ['place', 'emporter']; // ăn tại chỗ / mang đi
 
 const LIMITS = {

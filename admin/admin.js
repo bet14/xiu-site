@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-var LANGS=['fr','en','de','es','vi','zh','ko'];
+var LANGS=['fr','en','de','es','vi','zh','ko','ja'];
 var LNAME={fr:'FR · Tiếng Pháp',en:'EN · Tiếng Anh',de:'DE · Tiếng Đức',es:'ES · Tiếng Tây Ban Nha',vi:'VI · Tiếng Việt',zh:'中文 · Tiếng Trung',ko:'한국어 · Tiếng Hàn'};
 var BADGES=[['','Không có'],['signature','Signature'],['top1','Le nº 1 le plus aimé'],['top2','Le nº 2 le plus aimé'],['top3','Le nº 3 le plus aimé'],['populaire','Populaire'],['nouveau','Nouveau']];
 var MENU=[],WEEK=null,SITE=null,HOURS=null,TEXTS=null,IMAGES=[],online=false;
@@ -46,7 +46,7 @@ function normalize(src){
  });
  (src||[]).forEach(function(c,ci){
   (c.items||[]).forEach(function(it){
-   var o={id:'',icon:it.icon||'',img:it.img||'',price:it.price||'',veg:!!it.veg};
+   var o={id:'',icon:it.icon||'',img:it.img||'',price:it.price||'',veg:!!it.veg};if(it.halal)o.halal=true;
    if(it.badge)o.badge=it.badge;if(it.hide)o.hide=true;
    if(Array.isArray(it.days)&&it.days.length<7)o.days=it.days.filter(function(d){return d>=0&&d<=6;});
    LANGS.forEach(function(l){o[l]=normLang(it[l]);});
@@ -117,7 +117,7 @@ function renderItems(){
   return '<li class="row'+(i===selItem?' on':'')+(it.hide?' off':'')+'" draggable="true" data-idx="'+i+'"><span class="h" title="Kéo để đổi thứ tự">⋮⋮</span>'
   +'<span class="thumb">'+(it.img?'<img src="'+esc(imgUrl(it.img))+'" alt="" loading="lazy">':'không ảnh')+'</span>'
   +'<span class="t"><b>'+esc((it.icon?it.icon+' ':'')+(it.fr[0]||'(chưa đặt tên)'))+'</b><small>'+esc(it.price||'— chưa có giá')+(it.vi[0]?' · '+esc(it.vi[0]):'')+'</small>'
-  +'<small>'+(it.veg?'<span class="tag veg">chay</span>':'')+(b?'<span class="tag badge">'+esc(b)+'</span>':'')+(it.hide?'<span class="tag hide">đang ẩn</span>':'')+(it.days?'<span class="tag days">'+esc(daysLabel(it.days))+'</span>':'')+'</small></span>'
+  +'<small>'+(it.veg?'<span class="tag veg">chay</span>':'')+(it.halal?'<span class="tag veg">halal</span>':'')+(b?'<span class="tag badge">'+esc(b)+'</span>':'')+(it.hide?'<span class="tag hide">đang ẩn</span>':'')+(it.days?'<span class="tag days">'+esc(daysLabel(it.days))+'</span>':'')+'</small></span>'
   +'<span class="mv"><button data-mv="-1" title="Lên">▲</button><button data-mv="1" title="Xuống">▼</button></span></li>';
  }).join('')||'<li class="empty">Danh mục này chưa có món.</li>';
  $$('.row',ol).forEach(function(r){var i=+r.dataset.idx;
@@ -139,7 +139,7 @@ function renderEditor(){
  +'<div class="g3"><label class="f"><span>Giá</span><input type="text" data-f="price" value="'+esc(it.price)+'" placeholder="12,5 €"></label>'
  +'<label class="f"><span>Biểu tượng</span><input type="text" data-f="icon" value="'+esc(it.icon)+'" maxlength="8"></label>'
  +'<label class="f"><span>Nhãn</span><select data-f="badge">'+BADGES.map(function(b){return '<option value="'+b[0]+'"'+((it.badge||'')===b[0]?' selected':'')+'>'+esc(b[1])+'</option>';}).join('')+'</select></label></div>'
- +'<div class="checks"><label><input type="checkbox" data-f="veg"'+(it.veg?' checked':'')+'> Món chay (tự hiện thêm trong mục Veggie)</label><label><input type="checkbox" data-f="hide"'+(it.hide?' checked':'')+'> Tạm ẩn (hết hàng)</label></div>'
+ +'<div class="checks"><label><input type="checkbox" data-f="veg"'+(it.veg?' checked':'')+'> Món chay (tự hiện thêm trong mục Veggie)</label><label><input type="checkbox" data-f="halal"'+(it.halal?' checked':'')+'> Món halal (hiện tag halal)</label><label><input type="checkbox" data-f="hide"'+(it.hide?' checked':'')+'> Tạm ẩn (hết hàng)</label></div>'
  +'<div class="f days"><span>Ngày bán (bỏ chọn ngày nào thì hôm đó món không hiện trên menu và không đặt được)</span><div class="checks">'
  +DAYS.map(function(d){return '<label><input type="checkbox" data-day="'+d[0]+'"'+(!it.days||it.days.indexOf(d[0])>=0?' checked':'')+'> '+d[1]+'</label>';}).join('')
  +'</div><small class="days-warn"'+(it.days&&!it.days.length?'':' hidden')+'>Không chọn ngày nào: món sẽ không bao giờ hiện.</small></div>'
@@ -150,7 +150,7 @@ function renderEditor(){
  paintThumb();paintPreview();
  $$('[data-f]',box).forEach(function(el){el.addEventListener(el.type==='checkbox'||el.tagName==='SELECT'?'change':'input',function(){
   var k=el.dataset.f;
-  if(el.type==='checkbox'){if(k==='veg')it.veg=el.checked;else if(el.checked)it.hide=true;else delete it.hide;}
+  if(el.type==='checkbox'){if(k==='veg')it.veg=el.checked;else if(k==='halal'){if(el.checked)it.halal=true;else delete it.halal;}else if(el.checked)it.hide=true;else delete it.hide;}
   else if(k==='badge'){if(el.value)it.badge=el.value;else delete it.badge;}
   else it[k]=el.value;
   update();paintPreview();
@@ -178,7 +178,7 @@ function paintThumb(){var it=item(),t=$('#it-thumb');if(!t)return;t.innerHTML=it
 function paintPreview(){
  var it=item(),pv=$('#pv');if(!pv)return;var b=it.badge?(BADGES.filter(function(x){return x[0]===it.badge;})[0]||[,''])[1]:'';
  pv.innerHTML='<div class="pt"><div class="pn">'+esc((it.icon?it.icon+' ':'')+(it.fr[0]||'Tên món'))+'</div>'+(it.vi[0]?'<div class="pvi">'+esc(it.vi[0])+'</div>':'')
- +'<div class="pp">'+esc(it.price||'—')+(it.veg?' <span style="color:#2E7D32;font-weight:700;font-size:11px">veggie</span>':'')+'</div>'+(it.fr[1]?'<div class="pd">'+esc(it.fr[1])+'</div>':'')+(b?'<span class="pb"'+(it.badge==='signature'?' style="background:#D62F23"':it.badge==='populaire'?' style="background:#FFD23F;color:#222"':it.badge==='nouveau'?' style="background:#FF7A00;color:#222"':'')+'>'+esc(b)+'</span>':'')+'</div>'
+ +'<div class="pp">'+esc(it.price||'—')+(it.veg?' <span style="color:#2E7D32;font-weight:700;font-size:11px">veggie</span>':'')+(it.halal?' <span style="color:#B35600;font-weight:700;font-size:11px">halal</span>':'')+'</div>'+(it.fr[1]?'<div class="pd">'+esc(it.fr[1])+'</div>':'')+(b?'<span class="pb"'+(it.badge==='signature'?' style="background:#D62F23"':it.badge==='populaire'?' style="background:#FFD23F;color:#222"':it.badge==='nouveau'?' style="background:#FF7A00;color:#222"':'')+'>'+esc(b)+'</span>':'')+'</div>'
  +(it.img?'<div class="pi" style="background-image:url(\''+imgUrl(it.img).replace(/'/g,'%27')+'\')"></div>':'');
 }
 function renderMenuView(){if(selCat>=MENU.length)selCat=Math.max(0,MENU.length-1);renderCats();renderCatEdit();renderItems();renderEditor();}

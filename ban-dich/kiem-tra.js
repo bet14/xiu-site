@@ -5,7 +5,7 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..');
 const SNAP = path.join(__dirname, 'fr-da-dich.json');
-const LANGS = ['en', 'de', 'es', 'vi', 'zh', 'ko'];
+const LANGS = ['en', 'de', 'es', 'vi', 'zh', 'ko', 'ja'];
 global.window = {};
 eval(fs.readFileSync(path.join(ROOT, 'assets/menu.js'), 'utf8'));
 const items = [];
